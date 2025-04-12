@@ -5,10 +5,19 @@ const thread_sel = document.getElementById("selected_thread");
 const filters = ["BLUR", "SHARPNESS", "SATURATION", "GRAYSCALE"];
 const filter_dd = document.getElementById("filter_dd");
 const filter_sel = document.getElementById("selected_filter");
+const intensity = document.getElementById("intensity");
+
+const picker = document.getElementById("img-picker");
+const input = document.getElementById("input-img");
+
+input.addEventListener("dragenter", dragenter, false);
+input.addEventListener("dragover", dragover, false);
+input.addEventListener("drop", drop, false);
 
 twins.forEach((e) => {
     e.setAttribute("onclick", "toggle(this)");
 });
+intensity.setAttribute("onchange", "updateSel(this, selected_intensity)");
 
 function toggle(e) {
     if(e.classList.contains("selected")) return;
@@ -33,7 +42,38 @@ function selectDropdown(e, id) {
     id.innerHTML = e.innerHTML;
 }
 
+function updateSel(e, sel) {
+    sel.innerHTML = e.value;
+}
+
+function updateImg(img) {
+    let newsource = URL.createObjectURL(img);
+    console.log(newsource);
+    input.src = newsource;
+}
+
+function dragenter(e) {
+    e.stopPropagation();
+    e.preventDefault();
+}
+  
+function dragover(e) {
+    e.stopPropagation();
+    e.preventDefault();
+}
+function drop(e) {
+    e.stopPropagation();
+    e.preventDefault();
+  
+    let dt = e.dataTransfer;
+    let img = dt.files[0];
+  
+    updateImg(img);
+}
+  
+
 window.onload = () => {
     fillDropdown(thread_dd, thread_num, thread_sel);
     fillDropdown(filter_dd, filters, filter_sel);
+    intensity.value = 70;
 };

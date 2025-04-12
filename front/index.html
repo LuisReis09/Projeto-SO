@@ -17,8 +17,9 @@
     <div class="box bg float" id="main">
         <div class="box">
             <h2>
-            <span class="hl">Using threads</span>, we propose an C++ implementation that uses threads for a simple image processing,
-            thus showing the difference between this using and a no multi-thread using solution.
+            We made a web app using C++ to run images through simple processing,
+             showing the performance differences between a basic single-thread approach
+             and one making use of <span class="hl">multiple threads</span>.
             </h2>
         </div>
         <div class="box opts">
@@ -35,18 +36,21 @@
                 <div class="dropdown-content" id="filter_dd"></div>
             </div>
             <div class="opt">
-                <label for="">Filter Intensity:</label>
-                <input type="range" name="" id="">
+                <label for="inten">Filter Intensity: <span id="selected_intensity">70</span></label>
+                <input type="range" value="70" min="0" max="100" step="1" name="inten" id="intensity">
             </div>
         </div>
         <div class="center">
             <div class="box input imghold">
-                <label for="input">Input:</label>
-                <img src="assets/img/default.png" alt="" class="trans" id="input-img">
+                <h3>Input:</h3>
+                <label for="img-picker" class="file-select">
+                    <img src="assets/img/default.png" alt="" class="trans" id="input-img">
+                </label>
+                <input type="file" name="picker" id="img-picker" accept=".jpg,.jpeg,.png,.tif,.bmp" onchange="updateImg(this.files[0])"/>
             </div>
         </div>
         <div class="box opts">
-            <button class="process">
+            <button class="sticker" id="process">
                 Process
             </button>
         </div>
@@ -54,9 +58,9 @@
             <div class="box output imghold">
                 <label for="mult-out">Multi-thread:</label>
                 <div class="imgblock">
-                    <div class="boxy">
+                    <a class="boxy">
                         <i class="fa fa-chevron-down"></i>
-                    </div>
+                    </a>
                     <img src="assets/img/def-mult.png" alt="" class="trans" id="mult-out">
                 </div>
                 <h3 id="multi-time">20ms</h3>
@@ -64,19 +68,59 @@
             <div class="box output imghold">
                 <label for="single-out">Single-thread:</label>
                 <div class="imgblock">
-                    <div class="boxy">
+                    <a class="boxy">
                         <i class="fa fa-chevron-down"></i>
-                    </div>
+                    </a>
                     <img src="assets/img/def-sing.png" alt="" class="trans" id="single-out">
                 </div>
                 <h3 id="single-time">20ms</h3>
             </div>
         </div>
     </div>
-    <footer class="box foot">
-        <div class="box"></div>
+    <footer class="box bg float center foot">
+        <div class="box">
+            <h3>Members:</h3>
+            <div class="member-list">
+                <div class="member">
+                    <img src="assets/img/def-member.png" alt="" class="m-icon">
+                    <p class="m-name">@herickjf</p>
+                    <div class="m-socials">
+                        <a class="fa fa-linkedin"></a>
+                        <a href="https://github.com/Herickjf" class="fa fa-github"></a>
+                    </div>
+                </div>
+                <div class="member">
+                    <img src="assets/img/def-member.png" alt="" class="m-icon">
+                    <p class="m-name">@sunny-fellow</p>
+                    <div class="m-socials">
+                        <a class="fa fa-linkedin"></a>
+                        <a href="https://github.com/sunny-fellow" class="fa fa-github"></a>
+                    </div>
+                </div>
+                <div class="member">
+                    <img src="assets/img/def-member.png" alt="" class="m-icon">
+                    <p class="m-name">@luisr_</p>
+                    <div class="m-socials">
+                        <a class="fa fa-linkedin"></a>
+                        <a href="https://github.com/LuisReis09" class="fa fa-github"></a>
+                    </div>
+                </div>
+            </div>
+        </div>
         <hr class="vert">
-        <div class="box"></div>
+        <div class="box">
+            <h3>Image Processing with Multi-threads in C++</h3>
+            <div>
+                <p>UFPB - Centro de Informática</p>
+                <p>Operational Systems - Prof. Davi Henrique dos Santos</p>
+            </div>
+            <a href="">
+                <button class="sticker">
+                    <i class="fa fa-github"></i>
+                    <p>GitHub Repository</p>
+                </button>
+            </a>
+        </div>
     </footer>
 
 
