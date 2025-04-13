@@ -1,17 +1,17 @@
 :root {
---russian-violet: hsla(262, 100%, 8%, 1);
---russian-violet-2: hsla(271, 100%, 14%, 1);
---persian-indigo: hsla(271, 85%, 23%, 1);
---tekhelet: hsla(270, 73%, 35%, 1);
---french-violet: hsla(272, 63%, 46%, 1);
---amethyst: hsla(273, 68%, 59%, 1);
---heliotrope: hsla(274, 100%, 75%, 1);
---mauve: hsla(278, 100%, 83%, 1);
+    --russian-violet:   hsla(262, 100%, 8%, 1);
+    --russian-violet-2: hsla(271, 100%, 14%, 1);
+    --persian-indigo:   hsla(271, 85%, 23%, 1);
+    --tekhelet:         hsla(270, 73%, 35%, 1);
+    --french-violet:    hsla(272, 63%, 46%, 1);
+    --amethyst:         hsla(273, 68%, 59%, 1);
+    --heliotrope:       hsla(274, 100%, 75%, 1);
+    --mauve:            hsla(278, 100%, 83%, 1);
 }
 
 @font-face {
     font-family: Oldenburg;
-    src: url("assets/fonts/Oldenburg-Regular.ttf");
+    src: url("/getFont");
 }
 
 * {
@@ -70,26 +70,26 @@ header {
 }
 
 :is(.left-twin, .right-twin) {
-    width: 150px;
+    width: 8dvw;
     height: 2.5rem;
     font-size: 20px;
     font-family: Oldenburg;
 
     border: none;
-    background-color: #fff;
-    color: var(--russian-violet);
 }
 
 .left-twin {
+    background-color: #fff;
+    color: var(--russian-violet);
     border-radius: 15px 0 0 15px;
 }
 .right-twin {
+    background-color: var(--tekhelet);
+    color: #fff;
     border-radius: 0 15px 15px 0;
 }
 
 .selected {
-    background-color: var(--tekhelet);
-    color: #fff;
     outline: 3px solid var(--heliotrope);
     z-index: 1;
 }
@@ -99,7 +99,7 @@ header {
     flex-direction: column;
     gap: 0.5rem;
     width: fit-content;
-    width: 15rem;
+    width: 14dvw;
 }
 .opt label {
     font-size: 20px;
@@ -117,9 +117,9 @@ button:hover, .dropdown:hover {
     cursor: pointer;
 }
 
- /* Dropdown Button */
- .dropbtn {
-    width: 200px;
+    /* Dropdown Button */
+.dropbtn {
+    width: 14dvw;
     height: 3rem;
     padding: 16px;
 
@@ -142,18 +142,18 @@ button:hover, .dropdown:hover {
     color: var(--russian-violet);
     font-size: 20px;
 }
-  
+    
 /* The container <div> - needed to position the dropdown content */
 .dropdown {
     position: relative;
     display: inline-block;
 }
-  
+    
 /* Dropdown Content (Hidden by Default) */
 .dropdown-content {
     display: none;
     position: absolute;
-    min-width: 160px;
+    min-width: 8dvw;
     left: 1.25rem;
 
     background-color: var(--russian-violet-2);
@@ -215,6 +215,7 @@ button:hover, .dropdown:hover {
     height: auto;
     max-width: 40dvw;
     max-height: 80dvh;
+    cursor: pointer;
 }
 
 .imgblock {
