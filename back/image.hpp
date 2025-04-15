@@ -2,57 +2,40 @@
 #define _IMAGE_HPP_
 
 #include <iostream>
-#include <opencv2/opencv.hpp> // Ensure OpenCV is installed and the include path is set
-#include <opencv2/core.hpp>
+#include <opencv2/opencv.hpp>
 #include <string>
 
 using namespace std;
 using namespace cv;
 
-// typedef enum{
-//     IMAGE_TYPE_JPEG = "jpeg",
-//     IMAGE_TYPE_JPG = "jpg",
-//     IMAGE_TYPE_PNG = "png",
-//     IMAGE_TYPE_BMP = "bmp",
-//     IMAGE_TYPE_TIFF = "tiff"
-// } IMAGE_TYPE;
-
-// typedef enum{
-//     IMAGE_COLOR_RGB = "rgb",
-//     IMAGE_GRAYSCALE = "gray_scale"
-// } IMAGE_COLOR_TYPE;
-
-// typedef enum{
-//     IMAGE_BLUR_FILTER = "blur",
-//     IMAGE_NEGATIVE_FILTER = "negative",
-//     IMAGE_SHARPEN_FILTER = "sharpen",
-//     IMAGE_GAUSSIAN_FILTER = "gaussian",
-// } IMAGE_FILTER_TYPE;
-
-class Image {
-    private:
-        Mat image;
-        // IMAGE_TYPE type;
-        // IMAGE_COLOR_TYPE color_type;
-        string path;
-        int width;
-        int height;
-        string type;
-        string color_type;
-
-
-    public: 
-        Image(const vector<uchar>& buffer, const string color_type, const string type);
-
+enum class ImageType {
+    JPEG, JPG, PNG, BMP, TIFF
 };
 
+enum class ImageColorType {
+    RGB, GRAYSCALE
+};
 
-Image::Image(const vector<uchar>& buffer, const string color_type, const string type) {
-    this->color_type = color_type;
-    this->type = type;
+class Image {
+private:
+    Mat image;
+    ImageType type;
+    ImageColorType color_type;
+    string path;
+    int width;
+    int height;
 
+public: 
+    Image(const string& path, ImageColorType color_type, ImageType type);
+    void show();
+    void save();
+    void negative_filter();
+};
+
+inline Image::Image(const string& path, ImageColorType color_type, ImageType type) : 
+    path(path), color_type(color_type), type(type) {
     // Decodificando a imagem com base no tipo de cor
-    this->image = imdecode(buffer, color_type == "rgb" ? IMREAD_COLOR : IMREAD_GRAYSCALE);
+    this->image = imread(path, color_type == ImageColorType::RGB ? IMREAD_COLOR : IMREAD_GRAYSCALE);
     if (this->image.empty()) {
         cerr << "Erro: falha ao decodificar imagem!" << endl;
         exit(EXIT_FAILURE);
@@ -60,21 +43,59 @@ Image::Image(const vector<uchar>& buffer, const string color_type, const string 
 
     this->width = image.cols;
     this->height = image.rows;
-
-    // Exibe a imagem recebida:
-    imshow("Imagem Recebida", this->image);
-    waitKey(0); // Aguarda até que uma tecla seja pressionada
 }
 
-// void Image::saveImage(){
-//     if (this->image.empty()) {
-//         cerr << "Error: No image to save!" << endl;
-//         return;
-//     }
-//     string output_path = "output/output." + string(this->type);
+inline void Image::show() {
+    namedWindow("Janela Fixa", WINDOW_NORMAL); 
+    resizeWindow("Janela Fixa", 800, 600);
+    imshow("Janela Fixa", this->image);
+    waitKey(0);
+}
 
-//     return;
-// }
+inline void Image::save(){
+    string imName =  "imageOutput/image";
+    switch (this->type){
+        case ImageType::JPEG: 
+            imName += ".jpeg";
+            break;
+        case ImageType::JPG: 
+            imName += ".jpg";
+            break;
+        case ImageType::PNG: 
+            imName += ".png";
+            break;
+        case ImageType::BMP: 
+            imName += ".bpm";
+            break;
+        case ImageType::TIFF: 
+            imName += ".tiff";
+        default:
+            break;
+    }
 
+    imwrite(imName, this->image);
+    return;
+}
+
+inline void Image::negative_filter() {
+    if(this->color_type == ImageColorType::RGB) {
+        for(int i = 0; i < this->width; i++){
+            for(int j = 0; j < this->height; j++){
+                Vec3b& pixel = this->image.at<Vec3b>(j, i);
+                pixel[0] = 255 - pixel[0];
+                pixel[1] = 255 - pixel[1];
+                pixel[2] = 255 - pixel[2];
+            }
+        }
+    }
+    else { // imagem em escala de cinza
+        for(int i = 0; i < this->width; i++){
+            for(int j = 0; j < this->height; j++){
+                uchar& pixel = this->image.at<uchar>(j, i);
+                pixel = 255 - pixel;
+            }
+        }
+    }
+}
 
 #endif
