@@ -30,6 +30,7 @@ private:
 public: 
     // Constructor
     Image(const string& path, ImageColorType color_type, ImageType type);
+    Image(const vector<uchar>& buffer, ImageColorType color_type, ImageType type);
 
     // Functions
     void show();
