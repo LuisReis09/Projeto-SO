@@ -1,6 +1,7 @@
 #include <bits/stdc++.h>
 #include <opencv2/opencv.hpp>
 #include <opencv2/imgcodecs.hpp>
+#include <thread>
 #include "httplib.h"
 #include "image.hpp"
 
@@ -115,6 +116,7 @@ int main(){
             // cout << "Imagem recebida: " << file.filename << endl;
             cout << "Params received: " << param_intensity << "\n" << param_qtdThreads << "\n" << param_filter << "\n" << param_colorOption << endl;
             Image image(buffer, stringToImageColorType(param_colorOption), stringToImageType(param_filetype));
+            thread t_process(image.process(param_filter, stoi(param_intensity), stoi(param_qtdThreads)));
 
             // Retorna um json com o status_code e a mensagem de erro ou a imagem resultante
             res.status = 200;
