@@ -114,7 +114,7 @@ int main(){
             
             // cout << "Imagem recebida: " << file.filename << endl;
             cout << "Params received: " << param_intensity << "\n" << param_qtdThreads << "\n" << param_filter << "\n" << param_colorOption << endl;
-            Image image(buffer, param_colorOption, param_filetype);
+            Image image(buffer, stringToImageColorType(param_colorOption), stringToImageType(param_filetype));
 
             // Retorna um json com o status_code e a mensagem de erro ou a imagem resultante
             res.status = 200;
