@@ -23,11 +23,11 @@ int main(void){
                           { 81, 82, 83, 84, 85, 86, 87, 88, 89, 90},
                           { 91, 92, 93, 94, 95, 96, 97, 98, 99,100} };
 
-    vector<Coordinates> coords = getRegionCoordinates(10, 10, 10);
+    vector<Region> coords = getRegions(10, 10, 7);
 
     for (int coord = 0; coord < coords.size(); coord++){
-        for (int i = coords[coord].x_begin; i < coords[coord].x_end; i++){
-            for (int j = coords[coord].y_begin; j < coords[coord].y_end; j++){
+        for (int i = coords[coord].x_begin; i <= coords[coord].x_end; i++){
+            for (int j = coords[coord].y_begin; j <= coords[coord].y_end; j++){
                 cout << image[i][j] << " ";
             }
             cout << endl;

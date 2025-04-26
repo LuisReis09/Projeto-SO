@@ -7,6 +7,7 @@
 #include <opencv2/opencv.hpp>
 #include <string>
 #include <thread>
+#include "ThreadPool.hpp"
 
 using namespace std;
 using namespace cv;
@@ -24,27 +25,36 @@ typedef struct Timer{
     double end;
 } Timer;
 
-typedef struct Coordinates{
+typedef struct Region{
     int x_begin;
     int x_end;
     int y_begin;
     int y_end;
-} Coordinates;
+} Region;
 
 class Image {
 private:
     Mat image;
-    Mat image_singlethread;
-    Mat image_multithread;
     ImageType type;
     ImageColorType color_type;
     string path;
     vector<uchar> buffer;
     int width;
     int height;
+    vector<vector<uchar>> image_singlethread;
+    vector<vector<uchar>> image_multithread;
+
+    string filter = "none";
+    int intensity = 1;
+    ThreadPool thread_pool; // 12 threads maximas por padrão
+
+    int threads_done = 0;
+    bool single_thread_ended = false;
+    bool multi_thread_ended = false;
 
 public: 
     // Constructor
+    Image();
     Image(const string& path, ImageColorType color_type, ImageType type);
     Image(const vector<uchar>& buffer, ImageColorType color_type, ImageType type);
     void overwriteImage(const string& path, ImageColorType color_type, ImageType type);
@@ -53,23 +63,39 @@ public:
     // Functions
     void show();
     void save();
+    void save_singlethread();
+    void save_multithread();
 
     // Filters
-    void negative_filter();
+    void negative_filter(Region region, vector<vector<uchar>>& image_output);
 
     // Threads
+    void thread_process(Region region);
     void process (const string& filter, int intensity, int threads);
 };
 
 // DA CLASSE //////////////////////////////////
 Image::
-    Image(const string& path, ImageColorType color_type, ImageType type){
+    Image() : thread_pool(12) { 
+        this->path = "none";
+        this->color_type = ImageColorType::RGB;
+        this->type = ImageType::JPEG;
+        this->width = 0;
+        this->height = 0;
+
+    }
+
+
+Image::
+    Image(const string& path, ImageColorType color_type, ImageType type): thread_pool(12) {
         overwriteImage(path, color_type, type);
     }
 void Image::
-    overwrite(const string& path, ImageColorType color_type, ImageType type): 
-        path(path), color_type(color_type), type(type) {
-
+    overwriteImage(const string& path, ImageColorType color_type, ImageType type) {
+        
+        this->path = path;
+        this->color_type = color_type;
+        this->type = type;
         switch(this->color_type){
             case ImageColorType::RGB:
                 this->image = imread(path, IMREAD_COLOR);
@@ -94,12 +120,15 @@ void Image::
     }
 
 Image::
-    Image(const vector<uchar>& buffer, ImageColorType color_type, ImageType type){ 
+    Image(const vector<uchar>& buffer, ImageColorType color_type, ImageType type): thread_pool(12) { 
         overwriteImage(buffer, color_type, type);
     }
 void Image::
-    overwriteImage(const vector<uchar>& buffer, ImageColorType color_type, ImageType type) : 
-        buffer(buffer), color_type(color_type), type(type) {
+    overwriteImage(const vector<uchar>& buffer, ImageColorType color_type, ImageType type) {
+
+        this->buffer = buffer;
+        this->color_type = color_type;
+        this->type = type;
 
         if (buffer.empty()) { // se o buffer estiver vazio
             throw invalid_argument("Erro: buffer de imagem vazio!");
@@ -163,27 +192,75 @@ void Image::
         return;
     }
 
+void Image::
+    save_singlethread(){
+        // Coleta o vector de pixels da imagem e transforma em imagem
+        Mat image_singlethread(this->height, this->width, CV_8UC1, this->image_singlethread.data());
+        string imName =  "output/image_singlethread";
+        switch (this->type){
+            case ImageType::JPEG: 
+                imName += ".jpeg";
+                break;
+            case ImageType::JPG: 
+                imName += ".jpg";
+                break;
+            case ImageType::PNG: 
+                imName += ".png";
+                break;
+            case ImageType::BMP: 
+                imName += ".bpm";
+                break;
+            case ImageType::TIFF: 
+                imName += ".tiff";
+            default:
+                break;
+        }
+        imwrite(imName, image_singlethread);
+        return;
+    }
+
+void Image::
+    save_multithread(){
+        // Coleta o vector de pixels da imagem e transforma em imagem
+        Mat output_mat;
+        if (this->color_type == ImageColorType::RGB) {
+            output_mat = Mat(this->height, this->width, CV_8UC3, this->image_multithread.data());
+        } else {
+            output_mat = Mat(this->height, this->width, CV_8UC1, this->image_multithread.data());
+        }
+
+        string imName = "output/image_multithread";
+        switch (this->type) {
+            case ImageType::JPEG: imName += ".jpeg"; break;
+            case ImageType::JPG: imName += ".jpg"; break;
+            case ImageType::PNG: imName += ".png"; break;
+            case ImageType::BMP: imName += ".bmp"; break; // cuidado: .bmp, não .bpm
+            case ImageType::TIFF: imName += ".tiff"; break;
+            default: break;
+        }
+
+        imwrite(imName, output_mat);
+        return;
+    }
+
 // FILTROS //////////////////////////////////
 void Image::
-    negative_filter() {
-        if(this->color_type == ImageColorType::RGB) {
-            for(int i = 0; i < this->width; i++){
-                for(int j = 0; j < this->height; j++){
-                    Vec3b& pixel = this->image.at<Vec3b>(j, i);
-                    pixel[0] = 255 - pixel[0]; // canal azul
-                    pixel[1] = 255 - pixel[1]; // canal verde
-                    pixel[2] = 255 - pixel[2]; // canal vermelho
+    negative_filter(Region region, vector<vector<uchar>>& image_output) {
+        // Lê de image e coloca o resultado em image_out
+
+        for (int i = region.x_begin; i <= region.x_end; i++){
+            for (int j = region.y_begin; j <= region.y_end; j++){
+                // Se a imagem for colorida, aplica o filtro em cada canal
+                if (this->color_type == ImageColorType::RGB){
+                    image_output[j][i * 3 + 0] = 255 - this->image.at<Vec3b>(j, i)[0]; // B
+                    image_output[j][i * 3 + 1] = 255 - this->image.at<Vec3b>(j, i)[1]; // G
+                    image_output[j][i * 3 + 2] = 255 - this->image.at<Vec3b>(j, i)[2]; // R
+                } else {
+                    image_output[j][i] = 255 - this->image.at<uchar>(j, i);
                 }
             }
         }
-        else { // imagem em escala de cinza
-            for(int i = 0; i < this->width; i++){
-                for(int j = 0; j < this->height; j++){
-                    uchar& pixel = this->image.at<uchar>(j, i);
-                    pixel = 255 - pixel;
-                }
-            }
-        }
+
     }
 
 // FILTROS COM THREADS ////////////////////////
@@ -191,84 +268,118 @@ void Image::
 // ---
     
 // THREADS ////////////////////////
-void Image::
-    process(const string& filter, int intensity, int threads) {
-        // 1. Deve guardar no objeto os atributos intensity e filter
 
-        // 2. Deve atribuir 0 a cada pixel das imagens de saída, ou seja, limpar elas;
+// Reparte A em B pedacos de tamanhos aproximadamente iguais
+vector<int> getSteps(int A, int B){
+    vector<int> result(B, A/B); // inicializa o vetor com o valor base
+
+    int excess = A % B; // resto da divisao
+
+    for (int i = 0; i < excess; i++){
+        result[i] += 1; // distribui o resto entre as partes
+    }
+
+    return result;
+}
+    
+vector<Region>
+    getRegions(int width, int height, int threads) {
+        vector<Region> regions;
+        
+        if (width > height) {
+            vector<int> steps = getSteps(width, threads);
+            int last = -1;
+
+            for(int i = 0; i < threads; i++) {
+                Region region;
+                
+                // Se for o último, pega o resto da imagem
+                if (i == threads - 1) {
+                    region.x_begin = last+1;
+                    region.x_end = width-1;
+                } else {
+                    region.x_begin = last+1;
+                    last = region.x_end = last + steps[i];
+                }
+
+                region.y_begin = 0;
+                region.y_end = height-1;
+                regions.push_back(region);
+            }
+
+        } else {
+            vector<int> steps = getSteps(height, threads);
+            int last = -1;
+
+            if (threads > height){
+                threads = height;  // garante que o número de threads nao exceda a altura da imagem
+            }
+
+            for(int i = 0; i < threads; i++) {
+                Region region;
+                
+                // Se for o último, pega o resto da imagem
+                if (i == threads - 1) {
+                    region.y_begin = last+1;
+                    region.y_end = height-1;
+                } else {
+                    region.y_begin = last+1;
+                    last = region.y_end = last + steps[i];
+                }
+
+                region.x_begin = 0;
+                region.x_end = width-1;
+                regions.push_back(region);
+            }
+        }
+
+        return regions;
+    }
+
+// Essa funcao devera delegar a regiao recebida a uma funcao de filtro, utilizando o atributo filter e intensity da classe Image
+void Image::
+    thread_process(Region region) {
+        this->negative_filter(region, this->image_multithread); // Chama o filtro negativo, mas pode ser qualquer outro filtro
+        this->threads_done++;
+    }
+
+
+void Image::
+    process(const string& filter, int threads, int intensity = 1) {
+        // Deve guardar no objeto os atributos intensity e filter
+
+        this->intensity = intensity;
+        this->filter = filter;
+
+        // Deve atribuir 0 a cada pixel das imagens de saída, ou seja, limpar elas;
         this->image_singlethread.assign(this->height, vector<uchar>(this->width, 0));
         this->image_multithread.assign(this->height, vector<uchar>(this->width, 0));
 
-        // 3. Chamar a funcao que distribuira areas da imagem para cada thread
-
-        // 4. Cada thread deve processar a parte da imagem que lhe foi atribuida
-
-        for (int i = 0; i < threads; i++) {
-            // Considerando que intensity e filter são atributos da classe Image, globalmente acessíveis, entao nao é necessário passar como argumento para a thread
-            // Cada thread recebera sua area e processara a imagem
-            thread t(this->thread_process, coordenada_inicial, coordenada_final);
-        }
-    }
-    
-vector<Coordinates> 
-    getRegionCoordinates(int width, int height, int threads) {
-        vector<Coordinates> coords;
-        int step_x;
-        int step_y;
         
-        if(threads > height) {
-            if( threads > width){
-                int to_add = (threads % height == 0) ? 0 : 1;
-                threads = width;
-                step_y = (height / threads) + to_add;
-                step_x = width;
+        // Cada thread deve processar a parte da imagem que lhe foi atribuida ou se for o caso de uma thread, processar a imagem inteira
+        if(threads == 1){
+            // Processa a imagem inteira
+            this->single_thread_ended = false;
+            this->thread_process({0, this->width-1, 0, this->height-1});
+            this->single_thread_ended = true;
+        } else {
+            this->multi_thread_ended = false;
+            cout << "Iniciando processamento em " << threads << " threads..." << endl;
+            vector<Region> regions = getRegions(this->width, this->height, threads);
+            for (int i = 0; i < threads; i++){
+                this->thread_pool.enqueue([this, regions, i] {
+                    this->thread_process(regions[i]);
+                });
             }
-            else{
-                int to_add = (threads % width == 0) ? 0 : 1;
-                step_x = (width / threads) + to_add;
-                step_y = height;
+
+            cout << "Threads Processando imagem..." << endl;
+            while(this->threads_done < threads){
+                this_thread::sleep_for(chrono::milliseconds(100)); // Espera 100ms
             }
-        }else{
-            step_x = width;
-            int to_add = (threads % height == 0) ? 0 : 1;
-            step_y = (height / threads) + to_add;  
+            this->multi_thread_ended = true;
+            this->save_multithread(); // Salva a imagem processada
+            cout << "Processamento de imagem com threads finalizado!" << endl;
         }
-        
-        // int linhas_split = floor(sqrt(threads));
-        // int colunas_split = ceil((float)threads / linhas_split);
-
-        // step_x = width / linhas_split;
-        // step_y = height / colunas_split;
-
-        for (int i = 0; i < threads; i++) {
-            for (int j = 0; j < threads; j++) {
-                Coordinates coord;
-                coord.x_begin = i * step_x;
-                coord.y_begin = j * step_y;
-                coord.x_end = (i + 1) * step_x;
-                coord.y_end = (j + 1) * step_y;
-
-                if (coord.x_end >= width) coord.x_end = width;
-                if (coord.y_end >= height) coord.y_end = height;
-                coords.push_back(coord);
-            }
-        }
-
-        // for (int i = 0, r = 0; i < linhas_split; ++i) {
-        //     int linha_ini = i * step_x;
-        //     int linha_fim = (i == linhas_split - 1) ? width : linha_ini + step_x;
-    
-        //     for (int j = 0; j < colunas_split; ++j) {
-        //         if (r++ >= threads) break; // para no t-ésimo bloco
-    
-        //         int coluna_ini = j * step_y;
-        //         int coluna_fim = (j == colunas_split - 1) ? height : coluna_ini + step_y;
-    
-        //         coords.push_back({linha_ini, linha_fim, coluna_ini, coluna_fim});
-        //     }
-        // }
-
-        return coords;
     }
 
 

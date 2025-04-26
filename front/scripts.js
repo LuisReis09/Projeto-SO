@@ -94,6 +94,10 @@ function process(){
     formData.append("colorOption", color_sel);
     formData.append("filetype", type);
 
+    formData.forEach((value, key) => {
+        console.log(key, value);
+    })
+
     fetch("/process", {
         method: "POST",
         body: formData,
@@ -112,7 +116,12 @@ window.onload = () => {
     .then((data) => {
         fillDropdown(thread_dd, data.options, thread_sel);
     })
+
+    fetch("/getFiltersOptions")
+    .then((response) => response.json())
+    .then((data) => {
+        fillDropdown(filter_dd, data.options, filter_sel);
+    })
     
-    fillDropdown(filter_dd, filters, filter_sel);
     intensity.value = 5;
 };

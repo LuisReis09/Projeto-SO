@@ -8,6 +8,8 @@
 using namespace std;
 using namespace cv;
 
+
+
 string read_frontend_file(const string& filename) {
     ifstream file(filename);
     if (!file.is_open()) {
@@ -21,6 +23,7 @@ string read_frontend_file(const string& filename) {
 
 int main(){
     httplib::Server server;
+    shared_ptr<Image> img = make_shared<Image>();
 
     server.Get("/", [](const httplib::Request&, httplib::Response& res) {
         string html_content = read_frontend_file("../front/index.html");
@@ -94,7 +97,7 @@ int main(){
         res.set_content(image_content, "image/png");
     });
 
-    server.Post("/process", [](const httplib::Request& req, httplib::Response& res) {
+    server.Post("/process", [&img](const httplib::Request& req, httplib::Response& res) {
         try{
             auto it = req.files.find("image");
             if (it == req.files.end()) {
@@ -105,18 +108,28 @@ int main(){
             const auto& file = it->second;
             const std::string& image_data = file.content;
             
-            const auto param_intensity      = req.get_param_value("intensity");
-            const auto param_qtdThreads     = req.get_param_value("qtdThreads");
-            const auto param_filter         = req.get_param_value("filter");
-            const auto param_colorOption    = req.get_param_value("colorOption");
-            const auto param_filetype       = req.get_param_value("filetype");
+            // Função auxiliar para extrair campos do form-data
+            auto get_form_field = [&](const std::string& name) -> std::string {
+                auto it = req.files.find(name);
+                if (it == req.files.end()) {
+                    throw std::runtime_error("Campo '" + name + "' não encontrado");
+                }
+                return it->second.content;
+            };
+
+            // Extrai os parâmetros corretamente
+            const auto param_intensity = get_form_field("intensity");
+            const auto param_qtdThreads = get_form_field("qtdThreads");
+            const auto param_filter = get_form_field("filter");
+            const auto param_colorOption = get_form_field("colorOption");
+            const auto param_filetype = get_form_field("filetype");
             
             vector<uchar> buffer(image_data.begin(), image_data.end());
             
-            // cout << "Imagem recebida: " << file.filename << endl;
-            cout << "Params received: " << param_intensity << "\n" << param_qtdThreads << "\n" << param_filter << "\n" << param_colorOption << endl;
-            Image image(buffer, stringToImageColorType(param_colorOption), stringToImageType(param_filetype));
-            thread t_process(image.process(param_filter, stoi(param_intensity), stoi(param_qtdThreads)));
+            // Image img(buffer, stringToImageColorType(param_colorOption), stringToImageType(param_filetype));
+            img->overwriteImage(buffer, stringToImageColorType(param_colorOption), stringToImageType(param_filetype));
+            thread t_process(&Image::process, img,  param_filter, stoi(param_qtdThreads), stoi(param_intensity));
+            t_process.detach(); // Desanexa a thread para que ela possa continuar executando em segundo plano
 
             // Retorna um json com o status_code e a mensagem de erro ou a imagem resultante
             res.status = 200;
@@ -134,7 +147,7 @@ int main(){
     server.Get("/getThreadsOptions", [](const httplib::Request& req, httplib::Response& res) {
         try{
             res.status = 200;
-            string json_response = R"({"options": [2, 4, 8, 16]})";
+            string json_response = R"({"options": [2, 4, 6, 8, 10, 12]})";
             res.set_content(json_response, "application/json");
         }catch(exception& e){
             // Se faltou parametro, avisa
@@ -145,7 +158,7 @@ int main(){
         }
     });
 
-    server.Get("/getFilterOptions", [](const httplib::Request& req, httplib::Response& res) {
+    server.Get("/getFiltersOptions", [](const httplib::Request& req, httplib::Response& res) {
         try{
             const auto param_colorOption = req.get_param_value("colorOption");
             
@@ -153,7 +166,7 @@ int main(){
 
             // Retorna um json com o status_code e a mensagem de erro ou as opcoes possiveis
             res.status = 200;
-            string json_response = R"({"message": "filters options!"})";
+            string json_response = R"({"options": ["negative", "blur", "sharpen", "grayscale"]})";
             res.set_content(json_response, "application/json");
         }catch(exception& e){
             // Se faltou parametro, avisa
