@@ -128,6 +128,7 @@ int main(){
             
             // Image img(buffer, stringToImageColorType(param_colorOption), stringToImageType(param_filetype));
             img->overwriteImage(buffer, stringToImageColorType(param_colorOption), stringToImageType(param_filetype));
+            // img->overwriteImage(buffer, stringToImageColorType("hsv"), stringToImageType(param_filetype));
             thread t_process(&Image::process, img,  param_filter, stoi(param_qtdThreads), stoi(param_intensity));
             t_process.detach(); // Desanexa a thread para que ela possa continuar executando em segundo plano
 
