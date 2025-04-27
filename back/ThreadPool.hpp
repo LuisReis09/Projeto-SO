@@ -54,19 +54,24 @@
                 stop_all_threads(); // Para todas as threads
             }
 
-            // Para todas as threads e espera elas terminarem
             void stop_all_threads() {
                 {
                     lock_guard<mutex> lock(mtx);
-                    stop = true;
+                    stop = true;   // Indica que todas as threads devem parar.
                 }
-                cond_var.notify_all(); // acorda todas as threads
+                cond_var.notify_all(); // Notifica todas as threads.
+            
+                // Agora, sem aguardar, "matar" todas as threads.
                 for (auto& thread : threads) {
-                    if (thread.joinable())
-                        thread.join();
+                    if (thread.joinable()) {
+                        // Usando detach para que as threads terminem sem esperar pela execução.
+                        thread.detach();
+                    }
                 }
-
-                tasks = queue<function<void()>>(); // Limpa a fila de tarefas
+            
+                // Limpa a fila de tarefas para garantir que nenhuma tarefa incompleta continue
+                tasks = queue<function<void()>>(); // Limpa a fila de tarefas.
+                threads.clear(); // Limpa o vetor de threads.
             }
 
             // Adiciona uma tarefa a fila de tarefas
@@ -74,7 +79,6 @@
                 // Adiciona a tarefa na fila
                 lock_guard<mutex> lock(mtx);
                 tasks.push(move(task));
-                
 
                 // Notifica uma thread para processar a tarefa
                 cond_var.notify_one();

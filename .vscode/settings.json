@@ -6,6 +6,8 @@
         "chrono": "cpp",
         "xstring": "cpp",
         "algorithm": "cpp",
-        "cmath": "cpp"
+        "cmath": "cpp",
+        "stdexcept": "cpp",
+        "functional": "cpp"
     }
 }

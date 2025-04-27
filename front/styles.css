@@ -61,6 +61,7 @@ header {
     display: flex;
     justify-content: space-evenly;
     align-items: center;
+    gap: 1em    ;
 }
 
 .twins {
@@ -69,7 +70,7 @@ header {
     align-items: center;
 }
 
-:is(.left-twin, .right-twin) {
+:is(.left-twin, .middle-twin ,.right-twin) {
     width: 8dvw;
     height: 2.5rem;
     font-size: 20px;
@@ -83,8 +84,11 @@ header {
     color: var(--russian-violet);
     border-radius: 15px 0 0 15px;
 }
-.right-twin {
+.middle-twin {
     background-color: var(--tekhelet);
+}
+.right-twin {
+    background-color: var(--persian-indigo);
     color: #fff;
     border-radius: 0 15px 15px 0;
 }
@@ -99,7 +103,7 @@ header {
     flex-direction: column;
     gap: 0.5rem;
     width: fit-content;
-    width: 14dvw;
+    width: 12dvw;
 }
 .opt label {
     font-size: 20px;
@@ -204,10 +208,8 @@ button:hover, .dropdown:hover {
 }
 
 .imghold img {
-    width: auto;
+    width: 30dvw;
     height: auto;
-    max-width: 30dvw;
-    max-height: 60dvh;
 }
 
 .imghold #input-img {
@@ -278,6 +280,8 @@ button:hover, .dropdown:hover {
     align-items: center;
     text-align: center;
     justify-content: space-between;
+
+    gap: 2em;
 }
 
 .foot hr {
@@ -398,4 +402,9 @@ a {
     border: 3px solid var(--russian-violet-2);
     border-radius: 15px;
     box-shadow: -10px 10px var(--amethyst);
+}
+
+.sticker:hover {
+    background-color: var(--persian-indigo);
+    box-shadow: -10px 10px var(--french-violet);
 }

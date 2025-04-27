@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-    <title>Document</title>
+    <title>ImageProcessor</title>
 </head>
 <body class="oldenburg-regular">
     <header>
@@ -25,7 +25,8 @@
         <div class="box opts">
             <div class="twins">
                 <button class="twin left-twin">Grayscale</button>
-                <button class="twin right-twin selected">Colored</button>
+                <button class="twin middle-twin">HSV</button>
+                <button class="twin right-twin selected">RGB</button>
             </div>
             <div class="dropdown">
                 <button class="dropbtn"><i class="fa fa-chevron-down"></i><span><span id="selected_thread"></span> threads</span></button>
@@ -58,22 +59,22 @@
             <div class="box output imghold">
                 <label for="mult-out">Multi-thread:</label>
                 <div class="imgblock">
-                    <a class="boxy">
+                    <a class="boxy" id="mult-out-download">
                         <i class="fa fa-chevron-down"></i>
                     </a>
                     <img src="/def-mult.png" alt="" class="trans" id="mult-out">
                 </div>
-                <h3 id="multi-time">20ms</h3>
+                <h3 id="multi-time">0 ms</h3>
             </div>
             <div class="box output imghold">
                 <label for="single-out">Single-thread:</label>
                 <div class="imgblock">
-                    <a class="boxy">
+                    <a class="boxy" id="single-out-download">
                         <i class="fa fa-chevron-down"></i>
                     </a>
                     <img src="/def-sing.png" alt="" class="trans" id="single-out">
                 </div>
-                <h3 id="single-time">20ms</h3>
+                <h3 id="single-time">0 ms</h3>
             </div>
         </div>
     </div>
@@ -123,8 +124,6 @@
         </div>
     </footer>
 
-
-
-    <script src="/scripts.js"></script>
+    <script src="scripts.js"></script>
 </body>
 </html>

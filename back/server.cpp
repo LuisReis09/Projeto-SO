@@ -25,6 +25,7 @@ int main(){
     httplib::Server server;
     shared_ptr<Image> img = make_shared<Image>();
 
+
     server.Get("/", [](const httplib::Request&, httplib::Response& res) {
         string html_content = read_frontend_file("../front/index.html");
         if (html_content.empty()) {
@@ -126,9 +127,9 @@ int main(){
             
             vector<uchar> buffer(image_data.begin(), image_data.end());
             
-            // Image img(buffer, stringToImageColorType(param_colorOption), stringToImageType(param_filetype));
+            
+            cout << endl << "Image received!";
             img->overwriteImage(buffer, stringToImageColorType(param_colorOption), stringToImageType(param_filetype));
-            // img->overwriteImage(buffer, stringToImageColorType("hsv"), stringToImageType(param_filetype));
             thread t_process(&Image::process, img,  param_filter, stoi(param_qtdThreads), stoi(param_intensity));
             t_process.detach(); // Desanexa a thread para que ela possa continuar executando em segundo plano
 
@@ -145,10 +146,60 @@ int main(){
         }
     });
 
+    server.Get("/getSingleThreadImage", [&img](const httplib::Request& req, httplib::Response& res) {
+        try{
+            bool single_thread_done  = img->get_single_thread_done();
+            double single_thread_duration = img->get_single_thread_duration(single_thread_done);
+            vector<uchar> single_thread_image = img->get_single_thread_image();
+
+
+            res.status = 200;
+            // Set o cabeçalho para indicar que é uma imagem binária
+            res.set_header("Content-Type", "image/" + img->get_image_type());  // Defina o tipo de imagem correto (pode ser PNG, JPEG, etc.)
+            res.set_header("done", to_string(single_thread_done));  // Adiciona "done" como cabeçalho
+            res.set_header("duration", to_string(single_thread_duration));  // Adiciona "duration" como cabeçalho
+
+            // Envia os bytes da imagem diretamente no corpo da resposta
+            res.set_content(reinterpret_cast<const char*>(single_thread_image.data()), single_thread_image.size(), "image/" + img->get_image_type());  // Defina o tipo de imagem correto (pode ser PNG, JPEG, etc.)
+        }catch(exception& e){
+            // Se faltou parametro, avisa
+            cout << "Error: " << e.what() << endl;
+            res.status = 400;
+            string json_response = R"({"error": "bad request!"})";
+            res.set_content(json_response, "application/json");
+        }
+    });
+
+    server.Get("/getMultiThreadImage", [&img](const httplib::Request& req, httplib::Response& res) {
+        try{
+            bool multi_thread_done = img->get_multi_thread_done();
+            double multi_thread_duration = img->get_multi_thread_duration(multi_thread_done);
+            vector<uchar> multi_thread_image = img->get_multi_thread_image();
+
+
+            res.status = 200;
+            // Set o cabeçalho para indicar que é uma imagem binária
+            res.set_header("Content-Type", "image/" + img->get_image_type());  // Defina o tipo de imagem correto (pode ser PNG, JPEG, etc.)
+            res.set_header("done", to_string(multi_thread_done));  // Adiciona "done" como cabeçalho
+            res.set_header("duration", to_string(multi_thread_duration));  // Adiciona "duration" como cabeçalho
+            res.set_content(reinterpret_cast<const char*>(multi_thread_image.data()), multi_thread_image.size(), "image/" + img->get_image_type());  // Defina o tipo de imagem correto (pode ser PNG, JPEG, etc.)
+        }catch(exception& e){
+            // Se faltou parametro, avisa
+            cout << "Error: " << e.what() << endl;
+            res.status = 400;
+            string json_response = R"({"error": "bad request!"})";
+            res.set_content(json_response, "application/json");
+        }
+    });
+
     server.Get("/getThreadsOptions", [](const httplib::Request& req, httplib::Response& res) {
         try{
             res.status = 200;
-            string json_response = R"({"options": [2, 4, 6, 8, 10, 12]})";
+            // Consulta do sistema operacional quantas threads maximo o sistema suporta
+            // e subtrai 2, uma para o processamento single-thread e outra pro backend do servidor
+            // A fim de que o servidor não fique sobrecarregado com threads que ele não consegue suportar
+            int thread_max = thread::hardware_concurrency() - 2;
+            string json_response = R"({"maxThreads": )" + to_string(thread_max) + R"(})";
             res.set_content(json_response, "application/json");
         }catch(exception& e){
             // Se faltou parametro, avisa
@@ -167,7 +218,18 @@ int main(){
 
             // Retorna um json com o status_code e a mensagem de erro ou as opcoes possiveis
             res.status = 200;
-            string json_response = R"({"options": ["negative", "blur", "sharpen", "grayscale"]})";
+            string json_response = R"({"options": [
+                "negative", 
+                "blur", 
+                "sharpen", 
+                "grayscale", 
+                "median", 
+                "gaussian", 
+                "laplacian90 border",
+                "laplacian45 border",
+                "laplacian90 sharpen",
+                "laplacian45 sharpen"
+            ]})";
             res.set_content(json_response, "application/json");
         }catch(exception& e){
             // Se faltou parametro, avisa
@@ -196,6 +258,7 @@ int main(){
             res.set_content(json_response, "application/json");
         }
     });
+
 
     // Hosteia o server na porta 8080
     cout << "Server is running on http://localhost:4750" << endl;
