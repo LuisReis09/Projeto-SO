@@ -174,3 +174,25 @@ clear
 
 - Caso o OpenCV já esteja instalado, o `make install` será ignorado sem causar problemas.
 - O código é preparado para rodar em sistemas com suporte a múltiplas threads, para aproveitar o processamento paralelo.
+
+---
+
+### Distribuição de Tarefas
+
+- Herick
+    - Implementação do arquivo `image.hpp`;
+      - Incluindo criação de filtros e máscaras;
+      - Incluindo utilização de threads;
+    - Documentação de código.
+
+- Lael
+    - Front-end e interatividade;
+    - Formulação da logística da manipulação de threads;
+    - Criação da função de distribuição de regiões para as threads;
+    - Documentação de código.
+
+- Luis
+    - Implementação do arquivo `ThreadPool.hpp`;
+    - Criação de filtros;
+    - Comunicação front/back;
+    - Documentação de código.
