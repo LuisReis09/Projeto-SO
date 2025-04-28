@@ -1170,17 +1170,20 @@ void Image::
                     }
                     int g_mask[] = {0, 0, 0};
                     // Calcula a mascara no pixel atual para cada canal
-                    g_mask[0] = this->image.ptr<Vec3b>(j)[i][0] - meanValue[0]/weight; // B
-                    g_mask[1] = this->image.ptr<Vec3b>(j)[i][1] - meanValue[1]/weight; // G
-                    g_mask[2] = this->image.ptr<Vec3b>(j)[i][2] - meanValue[2]/weight; // R
+                    // g_mask[0] = this->image.ptr<Vec3b>(j)[i][0] - meanValue[0]/weight; // B
+                    // g_mask[1] = this->image.ptr<Vec3b>(j)[i][1] - meanValue[1]/weight; // G
+                    // g_mask[2] = this->image.ptr<Vec3b>(j)[i][2] - meanValue[2]/weight; // R
 
                     // Pega o pixel da imagem de saída
                     Vec3b& pixel = image_output.at<Vec3b>(j, i);
 
                     // Aplica a mascara em cada canal
-                    pixel[0] = clamp((double) round(this->image.ptr<Vec3b>(j)[i][0] + k * g_mask[0]), 0.0, 255.0); // B
-                    pixel[1] = clamp((double) round(this->image.ptr<Vec3b>(j)[i][1] + k * g_mask[1]), 0.0, 255.0); // G
-                    pixel[2] = clamp((double) round(this->image.ptr<Vec3b>(j)[i][2] + k * g_mask[2]), 0.0, 255.0); // R
+                    // pixel[0] = clamp((double) round(this->image.ptr<Vec3b>(j)[i][0] + k * g_mask[0]), 0.0, 255.0); // B
+                    // pixel[1] = clamp((double) round(this->image.ptr<Vec3b>(j)[i][1] + k * g_mask[1]), 0.0, 255.0); // G
+                    // pixel[2] = clamp((double) round(this->image.ptr<Vec3b>(j)[i][2] + k * g_mask[2]), 0.0, 255.0); // R
+                    pixel[0] = clamp((double) round(meanValue[0]/weight), 0.0, 255.0); // B
+                    pixel[1] = clamp((double) round(meanValue[1]/weight), 0.0, 255.0); // G
+                    pixel[2] = clamp((double) round(meanValue[2]/weight), 0.0, 255.0); // R
                 }
             }
                 
@@ -1216,14 +1219,15 @@ void Image::
                     Vec3b& pixel = image_output.at<Vec3b>(j, i);
 
                     // Calcula a mascara no pixel atual para o canal de Valor
-                    int g_mask = 0;
-                    g_mask = this->image.ptr<Vec3b>(j)[i][2] - meanValue/weight;
+                    // int g_mask = 0;
+                    // g_mask = this->image.ptr<Vec3b>(j)[i][2] - meanValue/weight;
 
                     pixel[0] = this->image.ptr<Vec3b>(j)[i][0]; // H (mantém o mesmo valor)
                     pixel[1] = this->image.ptr<Vec3b>(j)[i][1]; // S (mantém o mesmo valor)
 
                     // Aplica a mascara no canal de Valor
-                    pixel[2] = clamp((double) round(this->image.ptr<Vec3b>(j)[i][2] + k * g_mask), 0.0, 255.0); // V
+                    // pixel[2] = clamp((double) round(this->image.ptr<Vec3b>(j)[i][2] + k * g_mask), 0.0, 255.0); // V
+                    pixel[2] = clamp((double) round(meanValue/weight), 0.0, 255.0); // V
                 }
             }
 
@@ -1256,14 +1260,15 @@ void Image::
 
                     }
                     // Calcula a mascara no pixel atual para o canal único
-                    int g_mask = 0;
-                    g_mask = this->image.ptr<uchar>(j)[i] - meanValue/weight;
+                    // int g_mask = 0;
+                    // g_mask = this->image.ptr<uchar>(j)[i] - meanValue/weight;
 
                     // Pega o pixel da imagem de saída
                     uchar& pixel = image_output.at<uchar>(j, i);
 
                     // Aplica a mascara no canal de Valor
-                    pixel = clamp((double) round(this->image.ptr<uchar>(j)[i] + k * g_mask), 0.0, 255.0); // R
+                    // pixel = clamp((double) round(this->image.ptr<uchar>(j)[i] + k * g_mask), 0.0, 255.0); // V
+                    pixel = clamp((double) round(meanValue/weight), 0.0, 255.0); // V
                 }
             }
         }
