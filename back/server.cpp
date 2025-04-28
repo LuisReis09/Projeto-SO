@@ -9,7 +9,11 @@ using namespace std;
 using namespace cv;
 
 
-
+/*
+    * Função auxiliar para ler arquivos do frontend
+    * @param filename Nome do arquivo a ser lido
+    * @return Conteúdo do arquivo como string
+*/
 string read_frontend_file(const string& filename) {
     ifstream file(filename);
     if (!file.is_open()) {
@@ -25,7 +29,11 @@ int main(){
     httplib::Server server;
     shared_ptr<Image> img = make_shared<Image>();
 
-
+    /*
+        * Configuração do servidor HTTP
+        * O servidor escuta na porta 4750 e responde a requisições GET e POST
+        * para processar imagens e servir arquivos estáticos do frontend.
+    */
     server.Get("/", [](const httplib::Request&, httplib::Response& res) {
         string html_content = read_frontend_file("../front/index.html");
         if (html_content.empty()) {
@@ -35,6 +43,7 @@ int main(){
         res.set_content(html_content, "text/html");
     });
 
+    // Arquivos CSS do frontend
     server.Get("/styles.css", [](const httplib::Request&, httplib::Response& res) {
         string css_content = read_frontend_file("../front/styles.css");
         if (css_content.empty()) {
@@ -44,6 +53,7 @@ int main(){
         res.set_content(css_content, "text/css");
     });
 
+    // Arquivo JavaScript do frontend
     server.Get("/scripts.js", [](const httplib::Request&, httplib::Response& res) {
         string js_content = read_frontend_file("../front/scripts.js");
         if (js_content.empty()) {
@@ -53,6 +63,7 @@ int main(){
         res.set_content(js_content, "application/javascript");
     });
 
+    // Arquivo de fonte do frontend
     server.Get("/getFont", [](const httplib::Request&, httplib::Response& res) {
         string font_content = read_frontend_file("../front/assets/fonts/Oldenburg-Regular.ttf");
         if (font_content.empty()) {
@@ -62,6 +73,7 @@ int main(){
         res.set_content(font_content, "application/x-font-ttf");
     });
 
+    // Arquivos de imagem do frontend
     server.Get("/default.png", [](const httplib::Request&, httplib::Response& res) {
         string image_content = read_frontend_file("../front/assets/img/default.png");
         if (image_content.empty()) {
@@ -71,6 +83,7 @@ int main(){
         res.set_content(image_content, "image/png");
     });
 
+    // Arquivos de imagem do frontend
     server.Get("/def-member.png", [](const httplib::Request&, httplib::Response& res) {
         string image_content = read_frontend_file("../front/assets/img/def-member.png");
         if (image_content.empty()) {
@@ -80,6 +93,7 @@ int main(){
         res.set_content(image_content, "image/png");
     });
 
+    // Arquivos de imagem do frontend
     server.Get("/def-mult.png", [](const httplib::Request&, httplib::Response& res) {
         string image_content = read_frontend_file("../front/assets/img/def-mult.png");
         if (image_content.empty()) {
@@ -89,6 +103,7 @@ int main(){
         res.set_content(image_content, "image/png");
     });
 
+    // Arquivos de imagem do frontend
     server.Get("/def-sing.png", [](const httplib::Request&, httplib::Response& res) {
         string image_content = read_frontend_file("../front/assets/img/def-sing.png");
         if (image_content.empty()) {
@@ -98,6 +113,22 @@ int main(){
         res.set_content(image_content, "image/png");
     });
 
+    /*
+        * Endpoint para processar a imagem recebida do frontend
+        
+        @params:
+            - image: imagem a ser processada (formato binário)
+            - intensity: intensidade do filtro (inteiro)
+            - qtdThreads: quantidade de threads a serem utilizadas (inteiro)
+            - filter: tipo de filtro a ser aplicado (string)
+            - colorOption: opção de cor da imagem (string)
+            - filetype: tipo de arquivo da imagem (string)
+
+        * O servidor espera receber uma imagem no formato form-data com os parâmetros acima.
+
+        * O servidor chama a função `process` da classe `Image` para aplicar o filtro na imagem recebida.
+        * O servidor retorna um JSON informando se começou a processar a imagem ou se houve erro.
+    */
     server.Post("/process", [&img](const httplib::Request& req, httplib::Response& res) {
         try{
             auto it = req.files.find("image");
@@ -129,11 +160,14 @@ int main(){
             
             
             cout << endl << "Image received!";
-            img->overwriteImage(buffer, stringToImageColorType(param_colorOption), stringToImageType(param_filetype));
-            thread t_process(&Image::process, img,  param_filter, stoi(param_qtdThreads), stoi(param_intensity));
-            t_process.detach(); // Desanexa a thread para que ela possa continuar executando em segundo plano
 
-            // Retorna um json com o status_code e a mensagem de erro ou a imagem resultante
+            // Carrega os dados recebidos no objeto da classe Image
+            img->overwriteImage(buffer, stringToImageColorType(param_colorOption), stringToImageType(param_filetype));
+
+            // Inicia o processamento da imagem com os parâmetros recebidos
+            img->process(param_filter, stoi(param_qtdThreads), stoi(param_intensity));
+
+            // Retorna um json com o status_code e a mensagem de que comecou a processar a imagem
             res.status = 200;
             string json_response = R"({"message": "Image processed successfully!"})";
             res.set_content(json_response, "application/json");
@@ -146,6 +180,15 @@ int main(){
         }
     });
 
+    /*
+        * Endpoint para obter a imagem processada em um único thread
+        * Através dessa função, o front-end acompanha o progresso do processamento da imagem em uma thread única.
+        * 
+        * @returns:
+            - done: booleano indicando se o processamento foi concluído (cabeçalho)
+            - duration: duração do processamento em milissegundos (cabeçalho)
+            - image: imagem processada (formato binário)
+    */
     server.Get("/getSingleThreadImage", [&img](const httplib::Request& req, httplib::Response& res) {
         try{
             bool single_thread_done  = img->get_single_thread_done();
@@ -170,6 +213,15 @@ int main(){
         }
     });
 
+    /*
+        * Endpoint para obter a imagem processada em múltiplas threads
+        * Através dessa função, o front-end acompanha o progresso do processamento da imagem em múltiplas threads.
+        * 
+        * @returns:
+            - done: booleano indicando se o processamento foi concluído (cabeçalho)
+            - duration: duração do processamento em milissegundos (cabeçalho)
+            - image: imagem processada (formato binário)
+    */
     server.Get("/getMultiThreadImage", [&img](const httplib::Request& req, httplib::Response& res) {
         try{
             bool multi_thread_done = img->get_multi_thread_done();
@@ -192,12 +244,16 @@ int main(){
         }
     });
 
+    /*
+        * Endpoint para obter as opções de threads para o processamento de imagens via multi-threading.
+        * 
+        * @returns:
+            - maxThreads: número máximo de threads - 2, que é o número de threads disponíveis no sistema menos 2 (cabeçalho)
+            * Pois as outras duas threads são utilizadas para o processamento da imagem em single-threading e para a execução contínua do backend.
+    */
     server.Get("/getThreadsOptions", [](const httplib::Request& req, httplib::Response& res) {
         try{
             res.status = 200;
-            // Consulta do sistema operacional quantas threads maximo o sistema suporta
-            // e subtrai 2, uma para o processamento single-thread e outra pro backend do servidor
-            // A fim de que o servidor não fique sobrecarregado com threads que ele não consegue suportar
             int thread_max = thread::hardware_concurrency() - 2;
             string json_response = R"({"maxThreads": )" + to_string(thread_max) + R"(})";
             res.set_content(json_response, "application/json");
@@ -210,6 +266,12 @@ int main(){
         }
     });
 
+    /*
+        * Endpoint para obter as opções de filtros disponíveis para o processamento de imagens.
+        * 
+        * @returns:
+            - options: lista de filtros disponíveis (JSON)
+    */
     server.Get("/getFiltersOptions", [](const httplib::Request& req, httplib::Response& res) {
         try{
             const auto param_colorOption = req.get_param_value("colorOption");
@@ -232,26 +294,6 @@ int main(){
             ]})";
             res.set_content(json_response, "application/json");
         }catch(exception& e){
-            // Se faltou parametro, avisa
-            cout << "Error: " << e.what() << endl;
-            res.status = 400;
-            string json_response = R"({"error": "bad request!"})";
-            res.set_content(json_response, "application/json");
-        }
-    });
-
-    server.Get("/getIntensityRange", [](const httplib::Request& req, httplib::Response& res) {
-        try{
-            const auto param_filter = req.get_param_value("filter");
-            
-            // Implementar a logica de pegar na classe Image as intensidades minimas e maximas de acordo com o filtro escolhido
-
-            // Retorna um json com o status_code e a mensagem de erro ou as opcoes possiveis
-            res.status = 200;
-            string json_response = R"({"message": "intensity range!"})";
-            res.set_content(json_response, "application/json");
-        }catch(exception& e){
-            // Se faltou parametro, avisa
             cout << "Error: " << e.what() << endl;
             res.status = 400;
             string json_response = R"({"error": "bad request!"})";
@@ -260,7 +302,7 @@ int main(){
     });
 
 
-    // Hosteia o server na porta 8080
+    // Hosteia o server na porta 4750
     cout << "Server is running on http://localhost:4750" << endl;
     server.listen("localhost", 4750);
     

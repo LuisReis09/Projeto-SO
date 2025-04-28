@@ -36,16 +36,14 @@ input.addEventListener("dragover", dragover, false);
 input.addEventListener("drop", drop, false);
 process_but.addEventListener("click", process, false);
 multi_thread_download.addEventListener("click", function() {
+    if(multi_thread_image_link == null) return;
     multi_thread_download.href = multi_thread_image_link;
     multi_thread_download.download = "multithread.png";
-    if(multi_thread_image_link == null) return;
-    multi_thread_download.click();
 });
 single_thread_download.addEventListener("click", function() {
+    if(single_thread_image_link == null) return;
     single_thread_download.href = single_thread_image_link;
     single_thread_download.download = "singlethread.png";
-    if(single_thread_image_link == null) return;
-    single_thread_download.click();
 });
 
 
@@ -190,7 +188,7 @@ function gettingImage_SingleThread(seconds) {
         .then(({blob, done, duration}) => {
             single_thread_image.src = URL.createObjectURL(blob);
             single_thread_image_link = single_thread_image.src;
-            single_thread_duration.innerHTML = Number(duration).toLocaleString('de-DE', { minimumFractionDigits: 3, maximumFractionDigits: 3 }) + " s";
+            single_thread_duration.innerHTML = Number(duration).toLocaleString('de-DE', { minimumFractionDigits: 1, maximumFractionDigits: 1 }) + " ms";
             
             if(done == 1) {
                 stopState.single = true;
@@ -203,8 +201,6 @@ function gettingImage_SingleThread(seconds) {
 }
 
 function gettingImage_MultiThread(seconds) {
-    // Essa funcao vai atualizando as imagens a cada x milissegundos, consultando o servidor para pegar uma versão atualizada
-    // Isso mostra o progresso do processamento
     setTimeout(() => {
         fetch("/getMultiThreadImage")
         .then((response) => {
@@ -215,7 +211,7 @@ function gettingImage_MultiThread(seconds) {
         .then(({blob, done, duration}) => {
             multi_thread_image.src = URL.createObjectURL(blob);
             multi_thread_image_link = multi_thread_image.src;
-            multi_thread_duration.innerHTML = Number(duration).toLocaleString('de-DE', { minimumFractionDigits: 3, maximumFractionDigits: 3 }) + " s";
+            multi_thread_duration.innerHTML = Number(duration).toLocaleString('de-DE', { minimumFractionDigits: 1, maximumFractionDigits: 1 }) + " ms";
             if(done == 1) {
                 stopState.mult = true;
                 checkProcess();
