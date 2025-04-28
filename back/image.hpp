@@ -96,6 +96,7 @@ public:
     Image();
     Image(const string& path, ImageColorType color_type, ImageType type);
     Image(const vector<uchar>& buffer, ImageColorType color_type, ImageType type);
+    // Métodos utilizados para sobrescrever a imagem recebida como input
     void overwriteImage(const string& path, ImageColorType color_type, ImageType type);
     void overwriteImage(const vector<uchar>& buffer, ImageColorType color_type, ImageType type);
 
@@ -110,7 +111,7 @@ public:
     /*
         * Torna cada pixel da imagem em seu negativo, ou seja, inverte as cores.
         * @param region Região da imagem a ser processada
-        * @param image_output Matriz de imagem processada
+        * @param image_output Matriz de imagem que recebe o resultado do filtro
         * @returns: void
     */
     void negative_filter(Region region, Mat& image_output);
@@ -118,8 +119,8 @@ public:
     /*
         * Aplica um filtro de desfoque (blur) na imagem.
         * @param region Região da imagem a ser processada
-        * @param image_output Matriz de imagem processada
-        * @param intensity Intensidade do filtro (1-10)
+        * @param image_output Matriz de imagem que recebe o resultado do filtro
+        * @param intensity Intensidade do filtro
         * @returns: void
     */
     void blur_filter(Region region, Mat& image_output, int intensity);
@@ -127,19 +128,19 @@ public:
     /*
         * Aplica um filtro de nitidez (sharpen) na imagem.
         * @param region Região da imagem a ser processada
-        * @param image_output Matriz de imagem processada
-        * @param intensity Intensidade do filtro (1-10)
+        * @param image_output Matriz de imagem que recebe o resultado do filtro
+        * @param intensity Intensidade do filtro
         * @returns: void
     */
     void sharpen_filter(Region region, Mat& image_output, int intensity);
 
     /*
         * Aplica um filtro de mediana (median) na imagem, utilizado para reduzir ruídos.
-        * Esse filtro demanda mais processamento conforme `intensity` aumenta, pois precisará analisar mais pixels adjacentes.
+        * Esse filtro demanda mais processamento conforme `intensity` aumenta, pois precisará analisar mais pixels adjacentes e ordená-los.
         * 
         * @param region Região da imagem a ser processada
-        * @param image_output Matriz de imagem processada
-        * @param intensity Intensidade do filtro (1-10)
+        * @param image_output Matriz de imagem que recebe o resultado do filtro
+        * @param intensity Intensidade do filtro
         * @returns: void
     */
     void median_filter(Region region, Mat& image_output, int intensity);
@@ -147,7 +148,7 @@ public:
     /*
         * Aplica um filtro de escala de cinza (grayscale) na imagem, transformando a imagem colorida em uma imagem em tons de cinza.
         * @param region Região da imagem a ser processada
-        * @param image_output Matriz de imagem processada
+        * @param image_output Matriz de imagem que recebe o resultado do filtro
         * @returns: void
     */
     void grayscale_filter(Region region, Mat& image_output);
@@ -155,10 +156,10 @@ public:
     /*
         * Aplica um filtro de máscara (mask) na imagem, utilizando uma máscara personalizada.
         * @param region Região da imagem a ser processada
-        * @param image_output Matriz de imagem processada
+        * @param image_output Matriz de imagem que recebe o resultado do filtro
         * @param mask_Mat Máscara a ser aplicada na imagem
-        * @param intensity Intensidade do filtro (1-10)
-        * @param weight Peso da máscara (1-10)
+        * @param intensity Intensidade da máscara
+        * @param weight Somatório da máscara
         * @returns: void
     */
     void apply_mask_filter(Region region, Mat& image_output, Mask_t mask_Mat, int intensity, int weight);
@@ -166,56 +167,53 @@ public:
     /*
         * Aplica um filtro gaussiano (gaussian) na imagem, utilizado para suavizar a imagem.
         * @param region Região da imagem a ser processada
-        * @param image_output Matriz de imagem processada
-        * @param intensity Intensidade do filtro (1-10)
+        * @param image_output Matriz de imagem que recebe o resultado do filtro
+        * @param intensity Tamanho do kernel do filtro gaussiano (Dimensão M da matriz MxM gaussiana)
         * @returns: void
     */
     void gaussian_filter(Region region, Mat& image_output, int intensity);
 
     /*
-        * Aplica um filtro de laplaciano [DETALHAR]
+        * Aplica um filtro de laplaciano, somando o resultado da mascara com a imagem original, utilizando a intensidade passada como peso.
+        * Nesse caso, a máscara é a matriz de laplaciano 3x3. Não usa o valor das diagonais, por isso 90°.
         * @param region Região da imagem a ser processada
-        * @param image_output Matriz de imagem processada
-        * @param intensity Intensidade do filtro (1-10)
+        * @param image_output Matriz de imagem que recebe o resultado do filtro
+        * @param intensity Intensidade do filtro
         * @returns: void
     */
     void laplacian90_sharpen_filter(Region region, Mat& image_output, int intensity);
 
     /*
-        * Aplica um filtro de laplaciano [DETALHAR]
+        * Aplica um filtro de laplaciano e detecta as bordas da imagem.
+        * Nesse caso, a máscara é a matriz de laplaciano 3x3. Não usa o valor das diagonais, por isso 90°.
         * @param region Região da imagem a ser processada
-        * @param image_output Matriz de imagem processada
-        * @param intensity Intensidade do filtro (1-10)
-        * @returns: void
-    */
-
-    /*
-        * Aplica um filtro de laplaciano [DETALHAR]
-        * @param region Região da imagem a ser processada
-        * @param image_output Matriz de imagem processada
-        * @param intensity Intensidade do filtro (1-10)
+        * @param image_output Matriz de imagem que recebe o resultado do filtro
+        * @param intensity Intensidade do filtro
         * @returns: void
     */
     void laplacian90_border_detection_filter(Region region, Mat& image_output, int intensity);
 
     /*
-        * Aplica um filtro de laplaciano [DETALHAR]
+        * Aplica um filtro de laplaciano, somando o resultado da mascara com a imagem original, utilizando a intensidade passada como peso.
+        * Nesse caso, a máscara é a matriz de laplaciano 3x3. Usa o valor das diagonais, por isso 45°.
         * @param region Região da imagem a ser processada
-        * @param image_output Matriz de imagem processada
-        * @param intensity Intensidade do filtro (1-10)
+        * @param image_output Matriz de imagem que recebe o resultado do filtro
+        * @param intensity Intensidade do filtro
         * @returns: void
     */
     void laplacian45_sharpen_filter(Region region, Mat& image_output, int intensity);
 
     /*
-        * Aplica um filtro de laplaciano [DETALHAR]
+        * Aplica um filtro de laplaciano e detecta as bordas da imagem.
+        * Nesse caso, a máscara é a matriz de laplaciano 3x3. Usa o valor das diagonais, por isso 45°.
         * @param region Região da imagem a ser processada
-        * @param image_output Matriz de imagem processada
-        * @param intensity Intensidade do filtro (1-10)
+        * @param image_output Matriz de imagem que recebe o resultado do filtro
+        * @param intensity Intensidade do filtro
         * @returns: void
     */
     void laplacian45_border_detection_filter(Region region, Mat& image_output, int intensity);
     
+    // ===========================================================
     // Funções para processar a imagem em single e multi-threading
 
     /*
@@ -322,6 +320,8 @@ void Image::
         this->path = path;
         this->color_type = color_type;
         this->type = type;
+
+        // trata a interpretação de cor da imagem de acordo com o especificado
         switch(this->color_type){
             case ImageColorType::RGB:
                 this->image = imread(path, IMREAD_COLOR);
@@ -336,6 +336,8 @@ void Image::
             default:
                 throw invalid_argument("Erro: tipo de cor inválido!");
         }
+
+        // Verifica se a imagem foi carregada corretamente
         if (this->image.empty()) {
             cerr << "Erro: falha ao decodificar imagem!" << endl;
             exit(EXIT_FAILURE);
@@ -356,10 +358,12 @@ void Image::
         this->color_type = color_type;
         this->type = type;
 
-        if (buffer.empty()) { // se o buffer estiver vazio
+        // se o buffer estiver vazio
+        if (buffer.empty()) { 
             throw invalid_argument("Erro: buffer de imagem vazio!");
         }
 
+        // trata a interpretação de cor da imagem de acordo com o especificado
         switch(this->color_type){
             case ImageColorType::RGB:
                 this->image = imdecode(buffer, IMREAD_COLOR);
@@ -375,6 +379,7 @@ void Image::
                 throw invalid_argument("Erro: tipo de cor inválido!");
         }
 
+        // Verifica se a imagem foi carregada corretamente
         if (this->image.empty()) {
             cerr << "Erro: falha ao decodificar imagem!" << endl;
             exit(EXIT_FAILURE);
@@ -386,6 +391,7 @@ void Image::
 
 void Image::
     show() {
+        // exibe a imagem em uma janela
         namedWindow("Janela Fixa", WINDOW_NORMAL); 
         resizeWindow("Janela Fixa", 800, 600);
         imshow("Janela Fixa", this->image);
@@ -395,6 +401,8 @@ void Image::
 void Image::
     save(){
         string imName =  "output/image";
+
+        // salva a *imagem principal* da classe com a mesma extensão do arquivo original
         switch (this->type){
             case ImageType::JPEG: 
                 imName += ".jpeg";
@@ -420,10 +428,11 @@ void Image::
 
 void Image::
     save_singlethread(){
-        // Coleta o vector de pixels da imagem e transforma em imagem
-        // Mat image_singleThread(this->height, this->width, CV_8UC1, this->image_singleThread.data());
 
+        // salva a imagem processada em um único thread
         string imgName =  "output/image_singleThread";
+
+        // salva a imagem processada em um único thread com a mesma extensão do arquivo original
         switch (this->type){
             case ImageType::JPEG: 
                 imgName += ".jpeg";
@@ -449,7 +458,9 @@ void Image::
             Mat temp;
             cvtColor(this->image_singleThread, temp, COLOR_HSV2BGR);
             imwrite(imgName, temp);
-        }else // caso a imagem seja em tons de cinza ou RGB
+
+        // caso a imagem seja em tons de cinza ou RGB
+        }else 
             imwrite(imgName, this->image_singleThread);
 
         return;
@@ -458,7 +469,10 @@ void Image::
 void Image::
     save_multithread(){
 
+        // salva a imagem processada em múltiplos threads
         string imgName = "output/image_multiThread";
+
+        // salva a imagem processada em múltiplos threads com a mesma extensão do arquivo original
         switch (this->type) {
             case ImageType::JPEG: imgName += ".jpeg"; break;
             case ImageType::JPG: imgName += ".jpg"; break;
@@ -474,19 +488,24 @@ void Image::
             cvtColor(this->image_multiThread, temp, COLOR_HSV2BGR);
             imwrite(imgName, temp);
 
-        } else // caso a imagem seja em tons de cinza ou RGB
+        // caso a imagem seja em tons de cinza ou RGB
+        } else
             imwrite(imgName, this->image_multiThread);
 
         return;
     }
+// ===========================================================
 
+// Intervalo para normalização
 typedef struct Interval{
     float begin;
     float end;
 } Interval;
 
+// Normaliza o valor de intensidade para o intervalo especificado
 inline float normalizeInInterval(int value, Interval& interval){
     
+    // intervalo de intensidade original, recebido do frontend
     Interval intensity_interval = {1, 20};
     
     // Primeiro, normaliza o valor para o intervalo [0, 1]
@@ -513,8 +532,10 @@ void Image::
         if (this->color_type == ImageColorType::RGB){
             for (int i = region.x_begin; i <= region.x_end; i++){
                 for (int j = region.y_begin; j <= region.y_end; j++){
+
                     // Pega o pixel da imagem de saída
                     Vec3b& pixel = image_output.at<Vec3b>(j, i);
+
                     // Aplica o filtro negativo em cada canal
                     pixel[0] = 255 - this->image.at<Vec3b>(j, i)[0]; // B
                     pixel[1] = 255 - this->image.at<Vec3b>(j, i)[1]; // G
@@ -525,17 +546,20 @@ void Image::
         if(this->color_type == ImageColorType::HSV){
             for (int i = region.x_begin; i <= region.x_end; i++){
                 for (int j = region.y_begin; j <= region.y_end; j++){
+
                     // Pega o pixel da imagem de saída
                     Vec3b& pixel = image_output.at<Vec3b>(j, i);
+
                     // Aplica o filtro negativo em cada canal
-                    pixel[0] = (this->image.at<Vec3b>(j, i)[0] + 90) % 180 ; // H (girar "180 graus")
-                    pixel[1] = 255 - this->image.at<Vec3b>(j, i)[1]; // S
-                    pixel[2] = 255 - this->image.at<Vec3b>(j, i)[2]; // V
+                    pixel[0] = (this->image.at<Vec3b>(j, i)[0] + 90) % 180 ;    // H (girar "180 graus")
+                    pixel[1] = 255 - this->image.at<Vec3b>(j, i)[1];            // S
+                    pixel[2] = 255 - this->image.at<Vec3b>(j, i)[2];            // V
                 }
             }  
         }else { // imagem em tons de cinza
             for (int i = region.x_begin; i <= region.x_end; i++){
                 for (int j = region.y_begin; j <= region.y_end; j++){
+
                     // aplica o filtro negativo no canal único
                     image_output.at<uchar>(j, i) = 255 - this->image.at<uchar>(j, i);
                 }
@@ -605,14 +629,17 @@ void Image::
                             }
 
                             const Vec3b* input_row = this->image.ptr<Vec3b>(y); // Usando ptr<> para acessar a linha de pixels
+
                             // soma os valores dos pixels vizinhos no canal de Valor
                             meanValue += input_row[x][2]; // V
                         }
                     }
 
                     Vec3b* output_row = image_output.ptr<Vec3b>(j);
+
                     output_row[i][0] = this->image.ptr<Vec3b>(j)[i][0]; // H (mantém o mesmo valor)
                     output_row[i][1] = this->image.ptr<Vec3b>(j)[i][1]; // S (mantém o mesmo valor)
+
                     // define o pixel da imagem de saída como a média dos pixels vizinhos
                     output_row[i][2] = round(meanValue / ((intensity * 2 + 1) * (intensity * 2 + 1))); // V
                 }
@@ -637,6 +664,7 @@ void Image::
                                 continue;
                             }
 
+                            // soma os valores dos pixels vizinhos no canal único, usando ptr<> para acessar os pixels rapidamente
                             const uchar* input_row = this->image.ptr<uchar>(y);
                             meanValue += input_row[x];
                         }
@@ -654,10 +682,11 @@ void Image::
 
 void Image::
     sharpen_filter(Region region, Mat& image_output, int intensity){
+
         Interval interval = {1, 3};
         float k = normalizeInInterval(intensity, interval); // Normaliza a intensidade para o intervalo [1, 3]
     
-        int meanFilterIntensity = 5; // Intensidade do filtro de média
+        int meanFilterIntensity = 5; // Intensidade do filtro de média (um valor fixo)
     
         // Se a imagem for BGR, aplica o filtro em cada canal
         if (this->color_type == ImageColorType::RGB) {
@@ -734,6 +763,7 @@ void Image::
     
                     output_row[i][0] = this->image.ptr<Vec3b>(j)[i][0]; // H (mantém o mesmo valor)
                     output_row[i][1] = this->image.ptr<Vec3b>(j)[i][1]; // S (mantém o mesmo valor)
+
                     // Aplica o filtro de nitidez com intensidade k no canal de Valor, evitando overflow com a função clamp
                     output_row[i][2] = clamp((double) round(this->image.ptr<Vec3b>(j)[i][2] + k * gMask), 0.0, 255.0); // V
                 }
@@ -781,13 +811,11 @@ void Image::
 
 void Image::
     median_filter(Region region, Mat& image_output, int intensity) {
+
         // Se a imagem for BGR, aplica o filtro em cada canal
-        // Se a imagem for HSV, aplica o filtro no canal de Valor
-
         if(this->color_type == ImageColorType::RGB){
-            // Caso em que é pra imagem resultado tambem ser RGB
-            // Aplica o filtro de mediana em cada canal
 
+            // Aplica o filtro de mediana em cada canal
             for (int i = region.x_begin; i <= region.x_end; i++) {
                 for (int j = region.y_begin; j <= region.y_end; j++) {
                     vector<uchar> pixels[3]; // Vetor para armazenar os pixels vizinhos de cada canal
@@ -805,7 +833,7 @@ void Image::
                             }
     
                             const Vec3b* input_row = this->image.ptr<Vec3b>(y); // Usando ptr<> para acessar a linha de pixels
-                            pixels[0].push_back(input_row[x][0]); 
+                            pixels[0].push_back(input_row[x][0]); // B
                             pixels[1].push_back(input_row[x][1]); // G
                             pixels[2].push_back(input_row[x][2]); // R
                         }
@@ -821,10 +849,11 @@ void Image::
                 }
             }
 
-        }else if(this->color_type == ImageColorType::HSV){
-            // Caso em que é pra imagem resultado ser HSV
+        // Caso em que é pra imagem resultado ser HSV
+        }else 
+        if(this->color_type == ImageColorType::HSV){
+            
             // Aplica o filtro de mediana no canal de Valor
-
             for(int i = region.x_begin; i <= region.x_end; i++) {
                 for (int j = region.y_begin; j <= region.y_end; j++) {
                     vector<uchar> pixels;
@@ -854,16 +883,16 @@ void Image::
     
                     output_row[i][0] = this->image.ptr<Vec3b>(j)[i][0]; // H (mantém o mesmo valor)
                     output_row[i][1] = this->image.ptr<Vec3b>(j)[i][1]; // S (mantém o mesmo valor)
+
                     // Define o pixel da imagem de saída como a mediana dos pixels vizinhos
                     output_row[i][2] = medianValue;
                 }
             }
 
+        // Caso em que é pra imagem resultado ser em tons de cinza
         } else {
-            // Caso em que é pra imagem resultado ser em tons de cinza
-            // Para isso, obtem a mediana a partir das medias dos pixels vizinhos
-            // Para cada pixel da imagem, aplica o filtro
 
+            // Para cada pixel da imagem, aplica o filtro
             for (int i = region.x_begin; i <= region.x_end; i++) {
                 for (int j = region.y_begin; j <= region.y_end; j++) {
                     vector<uchar> pixels;
@@ -901,17 +930,17 @@ void Image::
 
 void Image::
     grayscale_filter(Region region, Mat& image_output) {
-        // Se a imagem for BGR, aplica o filtro em cada canal
-        // Se a imagem for HSV, aplica o filtro no canal de Valor
 
+        // Se a imagem for BGR, aplica o filtro em cada canal
         if(this->color_type == ImageColorType::RGB){
-            // Se a imagem for RGB, a intensidade é dada pelos três canais
             // O canal azul tem peso 0.114, o verde 0.587 e o vermelho 0.299
 
             for(int i = region.x_begin; i <= region.x_end; i++){
                 for (int j = region.y_begin; j <= region.y_end; j++){
+
                     // Pega o pixel da imagem de saída
                     Vec3b& pixel = image_output.at<Vec3b>(j, i);
+
                     // Aplica o filtro de grayscale em cada canal
                     pixel[0] = round(0.114 * this->image.at<Vec3b>(j, i)[0] + 0.587 * this->image.at<Vec3b>(j, i)[1] + 0.299 * this->image.at<Vec3b>(j, i)[2]); // B
                     pixel[1] = pixel[0]; // G
@@ -929,8 +958,10 @@ void Image::
 
             for(int i = region.x_begin; i <= region.x_end; i++){
                 for (int j = region.y_begin; j <= region.y_end; j++){
+
                     // Pega o pixel da imagem de saída
                     Vec3b& pixel = image_output.at<Vec3b>(j, i);
+
                     // Aplica o filtro de grayscale em cada canal
                     pixel[0] = this->image.at<Vec3b>(j, i)[0]; // H
                     pixel[1] = 0; // S
@@ -975,10 +1006,12 @@ vector<vector<float>> generateGaussianKernel(int kernelSize) {
 
 void Image::
     gaussian_filter(Region region, Mat& image_output, int intensity){
+
         Interval interval = {1, 40};
-        intensity = (int) normalizeInInterval(intensity, interval); // Normaliza a intensidade para o intervalo [1, 20]
+        intensity = (int) normalizeInInterval(intensity, interval); // Normaliza a intensidade para o intervalo [1, 40]
+
         Mask_t gaussian_mask = Mask_t(generateGaussianKernel(intensity)); // gera a mascara gaussiana de acordo com a intensidade passada
-        int kernel_radius = gaussian_mask.mask_.size() / 2;
+        int kernel_radius = gaussian_mask.mask_.size() / 2; // raio do kernel
 
         // Se a imagem for BGR, aplica a mascara em cada canal
         if(this->color_type == ImageColorType::RGB){
@@ -986,8 +1019,8 @@ void Image::
             // pra cada pixel da imagem, aplica o filtro
             for(int i = region.x_begin; i <= region.x_end; i++){
                 for(int j = region.y_begin; j <= region.y_end; j++){
-
                     float meanValue[] = {0.0, 0.0, 0.0};
+
                     // na vizinhanca da imagem de entrada, aplica a mascara
                     for(int k = -kernel_radius; k <= kernel_radius; k++){
                         for(int l = -kernel_radius; l <= kernel_radius; l++){
@@ -1003,7 +1036,7 @@ void Image::
                             // Pega o pixel da imagem de saída
                             Vec3b& pixel = this->image.at<Vec3b>(y, x);
 
-                            // Aplica a mascara em cada canal
+                            // Calcula a média ponderada dos pixels vizinhos em cada canal
                             meanValue[0] += pixel[0] * gaussian_mask.mask_[l + kernel_radius][k + kernel_radius]; // B
                             meanValue[1] += pixel[1] * gaussian_mask.mask_[l + kernel_radius][k + kernel_radius]; // G
                             meanValue[2] += pixel[2] * gaussian_mask.mask_[l + kernel_radius][k + kernel_radius]; // R
@@ -1027,8 +1060,8 @@ void Image::
             // pra cada pixel da imagem, aplica o filtro
             for(int i = region.x_begin; i <= region.x_end; i++){
                 for(int j = region.y_begin; j <= region.y_end; j++){
-
                     float meanValue = 0.0;
+
                     // na vizinhanca da imagem de entrada, aplica a mascara
                     for(int k = -kernel_radius; k <= kernel_radius; k++){
                         for(int l = -kernel_radius; l <= kernel_radius; l++){
@@ -1044,7 +1077,7 @@ void Image::
                             // Pega o pixel da imagem de saída
                             Vec3b& pixel = this->image.at<Vec3b>(y, x);
 
-                            // Aplica a mascara no canal de Valor
+                            // Calcula a média ponderada dos pixels vizinhos no canal de Valor
                             meanValue += pixel[2] * gaussian_mask.mask_[l + kernel_radius][k + kernel_radius]; // V
                         }
 
@@ -1054,6 +1087,7 @@ void Image::
 
                     pixel[0] = this->image.ptr<Vec3b>(j)[i][0]; // H (mantém o mesmo valor)
                     pixel[1] = this->image.ptr<Vec3b>(j)[i][1]; // S (mantém o mesmo valor)
+
                     // Aplica a mascara no canal de Valor
                     pixel[2] = clamp((double) round(meanValue), 0.0, 255.0); // V
                 }
@@ -1064,8 +1098,8 @@ void Image::
             // pra cada pixel da imagem, aplica o filtro
             for(int i = region.x_begin; i <= region.x_end; i++){
                 for(int j = region.y_begin; j <= region.y_end; j++){
-
                     float meanValue = 0.0;
+
                     // na vizinhanca da imagem de entrada, aplica a mascara
                     for(int k = -kernel_radius; k <= kernel_radius; k++){
                         for(int l = -kernel_radius; l <= kernel_radius; l++){
@@ -1088,6 +1122,7 @@ void Image::
                     }
                     // Pega o pixel da imagem de saída
                     uchar& pixel = image_output.at<uchar>(j, i);
+
                     // Aplica a mascara no canal único
                     pixel = clamp((double) round(meanValue), 0.0, 255.0); // R
                 }
@@ -1097,8 +1132,11 @@ void Image::
 
 void Image::
     apply_mask_filter(Region region, Mat& image_output, Mask_t mask_Mat, int intensity, int weight) {
+
         Interval interval = {1.0, 2.0};
-        float k = normalizeInInterval(intensity, interval); // Normaliza a intensidade para o intervalo [0.5, 2]
+        float k = normalizeInInterval(intensity, interval); // Normaliza a intensidade para o intervalo [1.0, 2]
+
+        int kernel_radius = mask_Mat.mask_.size() / 2; // raio do kernel
 
         // Se a imagem for BGR, aplica a mascara em cada canal
         if(this->color_type == ImageColorType::RGB){
@@ -1106,11 +1144,11 @@ void Image::
             // pra cada pixel da imagem, aplica o filtro
             for(int i = region.x_begin; i <= region.x_end; i++){
                 for(int j = region.y_begin; j <= region.y_end; j++){
-
                     int meanValue[] = {0, 0, 0};
+
                     // na vizinhanca da imagem de entrada, aplica a mascara
-                    for(int k = -mask_Mat.mask_.size(); k <= mask_Mat.mask_.size(); k++){
-                        for(int l = -mask_Mat.mask_[0].size(); l <= mask_Mat.mask_[0].size(); l++){
+                    for(int k = -kernel_radius; k <= kernel_radius; k++){
+                        for(int l = -kernel_radius; l <= kernel_radius; l++){
                             // Pega o pixel vizinho
                             int x = i + k;
                             int y = j + l;
@@ -1123,7 +1161,7 @@ void Image::
                             // Pega o pixel da imagem de saída
                             Vec3b& pixel = this->image.at<Vec3b>(y, x);
 
-                            // Aplica a mascara em cada canal
+                            // Calcula a média ponderada dos pixels vizinhos em cada canal
                             meanValue[0] += pixel[0] * mask_Mat.mask_[l+1][k+1]; // B
                             meanValue[1] += pixel[1] * mask_Mat.mask_[l+1][k+1]; // G
                             meanValue[2] += pixel[2] * mask_Mat.mask_[l+1][k+1]; // R
@@ -1138,6 +1176,7 @@ void Image::
 
                     // Pega o pixel da imagem de saída
                     Vec3b& pixel = image_output.at<Vec3b>(j, i);
+
                     // Aplica a mascara em cada canal
                     pixel[0] = clamp((double) round(this->image.ptr<Vec3b>(j)[i][0] + k * g_mask[0]), 0.0, 255.0); // B
                     pixel[1] = clamp((double) round(this->image.ptr<Vec3b>(j)[i][1] + k * g_mask[1]), 0.0, 255.0); // G
@@ -1151,11 +1190,11 @@ void Image::
             // pra cada pixel da imagem, aplica o filtro
             for(int i = region.x_begin; i <= region.x_end; i++){
                 for(int j = region.y_begin; j <= region.y_end; j++){
-
                     int meanValue = 0;
+
                     // na vizinhanca da imagem de entrada, aplica a mascara
-                    for(int k = -mask_Mat.mask_.size(); k <= mask_Mat.mask_.size(); k++){
-                        for(int l = -mask_Mat.mask_[0].size(); l <= mask_Mat.mask_[0].size(); l++){
+                    for(int k = -kernel_radius; k <= kernel_radius; k++){
+                        for(int l = -kernel_radius; l <= kernel_radius; l++){
                             // Pega o pixel vizinho
                             int x = i + k;
                             int y = j + l;
@@ -1168,33 +1207,37 @@ void Image::
                             // Pega o pixel da imagem de saída
                             Vec3b& pixel = this->image.at<Vec3b>(y, x);
 
-                            // Aplica a mascara no canal de Valor
+                            // Calcula a média ponderada dos pixels vizinhos no canal de Valor
                             meanValue += pixel[2] * mask_Mat.mask_[l+1][k+1]; // V
                         }
 
                     }
                     // Pega o pixel da imagem de saída
                     Vec3b& pixel = image_output.at<Vec3b>(j, i);
+
+                    // Calcula a mascara no pixel atual para o canal de Valor
                     int g_mask = 0;
                     g_mask = this->image.ptr<Vec3b>(j)[i][2] - meanValue/weight;
 
                     pixel[0] = this->image.ptr<Vec3b>(j)[i][0]; // H (mantém o mesmo valor)
                     pixel[1] = this->image.ptr<Vec3b>(j)[i][1]; // S (mantém o mesmo valor)
+
                     // Aplica a mascara no canal de Valor
                     pixel[2] = clamp((double) round(this->image.ptr<Vec3b>(j)[i][2] + k * g_mask), 0.0, 255.0); // V
                 }
             }
 
-        }else{ // imagem em tons de conza
+        // imagem em tons de conza 
+        }else{ 
 
             // pra cada pixel da imagem, aplica o filtro
             for(int i = region.x_begin; i <= region.x_end; i++){
                 for(int j = region.y_begin; j <= region.y_end; j++){
-
                     int meanValue = 0;
+
                     // na vizinhanca da imagem de entrada, aplica a mascara
-                    for(int k = -mask_Mat.mask_.size(); k <= mask_Mat.mask_.size(); k++){
-                        for(int l = -mask_Mat.mask_[0].size(); l <= mask_Mat.mask_[0].size(); l++){
+                    for(int k = -kernel_radius; k <= kernel_radius; k++){
+                        for(int l = -kernel_radius; l <= kernel_radius; l++){
                             // Pega o pixel vizinho
                             int x = i + k;
                             int y = j + l;
@@ -1212,10 +1255,13 @@ void Image::
                         }
 
                     }
+                    // Calcula a mascara no pixel atual para o canal único
                     int g_mask = 0;
                     g_mask = this->image.ptr<uchar>(j)[i] - meanValue/weight;
+
                     // Pega o pixel da imagem de saída
                     uchar& pixel = image_output.at<uchar>(j, i);
+
                     // Aplica a mascara no canal de Valor
                     pixel = clamp((double) round(this->image.ptr<uchar>(j)[i] + k * g_mask), 0.0, 255.0); // R
                 }
@@ -1241,7 +1287,6 @@ void Image::
         apply_mask_filter(region, image_output, laplacian45_mask, intensity, 1); // peso dos valores da mascara = 1
     }
 
-
 void Image::
     laplacian90_sharpen_filter(Region region, Mat& image_output, int intensity){
         Mask_t laplacian90_mask = Mask_t({  {0,  1, 0}, 
@@ -1257,8 +1302,8 @@ void Image::
             // pra cada pixel da imagem, aplica o filtro
             for(int i = region.x_begin; i <= region.x_end; i++){
                 for(int j = region.y_begin; j <= region.y_end; j++){
-
                     int meanValue[] = {0, 0, 0};
+
                     // na vizinhanca da imagem de entrada, aplica a mascara
                     for(int k = -1; k <= 1; k++){
                         for(int l = -1; l <= 1; l++){
@@ -1274,7 +1319,7 @@ void Image::
                             // Pega o pixel da imagem de saída
                             Vec3b& pixel = this->image.at<Vec3b>(y, x);
 
-                            // Aplica a mascara em cada canal
+                            // Calcula a média ponderada dos pixels vizinhos em cada canal
                             meanValue[0] += pixel[0] * laplacian90_mask.mask_[l+1][k+1]; // B
                             meanValue[1] += pixel[1] * laplacian90_mask.mask_[l+1][k+1]; // G
                             meanValue[2] += pixel[2] * laplacian90_mask.mask_[l+1][k+1]; // R
@@ -1284,6 +1329,7 @@ void Image::
                     // Pega o pixel da imagem de saída
                     Vec3b& pixel = image_output.at<Vec3b>(j, i);
                     Vec3b& input_pixel = this->image.at<Vec3b>(j, i); 
+
                     // Aplica a mascara em cada canal
                     pixel[0] = clamp((double) round(input_pixel[0] - k * meanValue[0]), 0.0, 255.0); // B
                     pixel[1] = clamp((double) round(input_pixel[1] - k * meanValue[1]), 0.0, 255.0); // G
@@ -1297,8 +1343,8 @@ void Image::
             // pra cada pixel da imagem, aplica o filtro
             for(int i = region.x_begin; i <= region.x_end; i++){
                 for(int j = region.y_begin; j <= region.y_end; j++){
-
                     int meanValue = 0;
+
                     // na vizinhanca da imagem de entrada, aplica a mascara
                     for(int k = -1; k <= 1; k++){
                         for(int l = -1; l <= 1; l++){
@@ -1315,7 +1361,7 @@ void Image::
                             Vec3b& pixel = this->image.at<Vec3b>(y, x);
 
 
-                            // Aplica a mascara no canal de Valor
+                            // Calcula a média ponderada dos pixels vizinhos no canal de Valor
                             meanValue += pixel[2] * laplacian90_mask.mask_[l+1][k+1]; // V
                         }
 
@@ -1326,6 +1372,7 @@ void Image::
 
                     pixel[0] = input_pixel[0]; // H (mantém o mesmo valor)
                     pixel[1] = input_pixel[1]; // S (mantém o mesmo valor)
+
                     // Aplica a mascara no canal de Valor
                     pixel[2] = clamp((double) round(input_pixel[2] - k * meanValue), 0.0, 255.0); // V
                 }
@@ -1336,8 +1383,8 @@ void Image::
             // pra cada pixel da imagem, aplica o filtro
             for(int i = region.x_begin; i <= region.x_end; i++){
                 for(int j = region.y_begin; j <= region.y_end; j++){
-
                     int meanValue = 0;
+
                     // na vizinhanca da imagem de entrada, aplica a mascara
                     for(int k = -1; k <= 1; k++){
                         for(int l = -1; l <= 1; l++){
@@ -1361,20 +1408,22 @@ void Image::
                     // Pega o pixel da imagem de saída
                     uchar& pixel = image_output.at<uchar>(j, i);
                     uchar& input_pixel = this->image.at<uchar>(j, i);
+
                     // Aplica a mascara no canal de Valor
                     pixel = clamp((double) round(input_pixel - k * meanValue), 0.0, 255.0); // R
                 }
             }
         }
     }   
+
 void Image::
     laplacian45_sharpen_filter(Region region, Mat& image_output, int intensity){
         Mask_t laplacian45_mask = Mask_t({  {1,  1, 1}, 
                                             {1, -8, 1}, 
-                                            {1,  1, 1} }); // mascara de laplaciano sem as diagonais
+                                            {1,  1, 1} }); // mascara de laplaciano com as diagonais
 
         Interval interval = {0.5, 3.5};
-        float k = normalizeInInterval(intensity, interval); // Normaliza a intensidade para o intervalo [0.5, 2]
+        float k = normalizeInInterval(intensity, interval); // Normaliza a intensidade para o intervalo [0.5, 3.5]
 
         // Se a imagem for BGR, aplica a mascara em cada canal
         if(this->color_type == ImageColorType::RGB){
@@ -1382,8 +1431,8 @@ void Image::
             // pra cada pixel da imagem, aplica o filtro
             for(int i = region.x_begin; i <= region.x_end; i++){
                 for(int j = region.y_begin; j <= region.y_end; j++){
-
                     int meanValue[] = {0, 0, 0};
+
                     // na vizinhanca da imagem de entrada, aplica a mascara
                     for(int k = -1; k <= 1; k++){
                         for(int l = -1; l <= 1; l++){
@@ -1399,7 +1448,7 @@ void Image::
                             // Pega o pixel da imagem de saída
                             Vec3b& pixel = this->image.at<Vec3b>(y, x);
 
-                            // Aplica a mascara em cada canal
+                            // Calcula a média ponderada dos pixels vizinhos em cada canal
                             meanValue[0] += pixel[0] * laplacian45_mask.mask_[l+1][k+1]; // B
                             meanValue[1] += pixel[1] * laplacian45_mask.mask_[l+1][k+1]; // G
                             meanValue[2] += pixel[2] * laplacian45_mask.mask_[l+1][k+1]; // R
@@ -1409,6 +1458,7 @@ void Image::
                     // Pega o pixel da imagem de saída
                     Vec3b& pixel = image_output.at<Vec3b>(j, i);
                     Vec3b& input_pixel = this->image.at<Vec3b>(j, i); 
+
                     // Aplica a mascara em cada canal
                     pixel[0] = clamp((double) round(input_pixel[0] - k * meanValue[0]), 0.0, 255.0); // B
                     pixel[1] = clamp((double) round(input_pixel[1] - k * meanValue[1]), 0.0, 255.0); // G
@@ -1422,8 +1472,8 @@ void Image::
             // pra cada pixel da imagem, aplica o filtro
             for(int i = region.x_begin; i <= region.x_end; i++){
                 for(int j = region.y_begin; j <= region.y_end; j++){
-
                     int meanValue = 0;
+
                     // na vizinhanca da imagem de entrada, aplica a mascara
                     for(int k = -1; k <= 1; k++){
                         for(int l = -1; l <= 1; l++){
@@ -1450,6 +1500,7 @@ void Image::
 
                     pixel[0] = input_pixel[0]; // H (mantém o mesmo valor)
                     pixel[1] = input_pixel[1]; // S (mantém o mesmo valor)
+
                     // Aplica a mascara no canal de Valor
                     pixel[2] = clamp((double) round(input_pixel[2] - k * meanValue), 0.0, 255.0); // V
                 }
@@ -1460,8 +1511,8 @@ void Image::
             // pra cada pixel da imagem, aplica o filtro
             for(int i = region.x_begin; i <= region.x_end; i++){
                 for(int j = region.y_begin; j <= region.y_end; j++){
-
                     int meanValue = 0;
+
                     // na vizinhanca da imagem de entrada, aplica a mascara
                     for(int k = -1; k <= 1; k++){
                         for(int l = -1; l <= 1; l++){
@@ -1485,6 +1536,7 @@ void Image::
                     // Pega o pixel da imagem de saída
                     uchar& pixel = image_output.at<uchar>(j, i);
                     uchar& input_pixel = this->image.at<uchar>(j, i);
+
                     // Aplica a mascara no canal único
                     pixel = clamp((double) round(input_pixel - k * meanValue), 0.0, 255.0); 
                 }
@@ -1640,7 +1692,7 @@ void Image::
     process(const string& filter, int threads, int intensity = 1) {
         // Define, inicialmente, que o processamento em multi-thread e em single-thread ainda não acabou, ou seja, que ainda ainda estão em processamento.
         this->single_thread_ended = false;
-        this->single_thread_ended = false;
+        this->multi_thread_ended = false;
 
         // Deve guardar no objeto o atributo intensity
         this->intensity = intensity;
@@ -1696,6 +1748,7 @@ void Image::
 
 
 // AUXILIARES //////////////////////////////////
+// Recebe uma string e retorna o tipo de imagem correspondente
 inline ImageType stringToImageType(const string& str) {
     if (str == "jpeg") return ImageType::JPEG;
     if (str == "jpg") return ImageType::JPG;
@@ -1704,6 +1757,7 @@ inline ImageType stringToImageType(const string& str) {
     if (str == "tiff") return ImageType::TIFF;
     throw invalid_argument("Tipo de imagem inválido");
 }
+// Recebe uma string e retorna o tipo de cor correspondente
 inline ImageColorType stringToImageColorType(const string& str) {
     if (str == "rgb") return ImageColorType::RGB;
     if (str == "hsv") return ImageColorType::HSV;

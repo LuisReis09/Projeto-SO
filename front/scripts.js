@@ -190,7 +190,7 @@ function gettingImage_SingleThread(seconds) {
             single_thread_image_link = single_thread_image.src;
             single_thread_duration.innerHTML = Number(duration).toLocaleString('de-DE', { minimumFractionDigits: 1, maximumFractionDigits: 1 }) + " ms";
             
-            if(done == 1) {
+            if(done == "1") {
                 stopState.single = true;
                 checkProcess();
             }else{
@@ -209,10 +209,11 @@ function gettingImage_MultiThread(seconds) {
             return response.blob().then(blob => ({ blob, done, duration }));
         })
         .then(({blob, done, duration}) => {
+                     
             multi_thread_image.src = URL.createObjectURL(blob);
             multi_thread_image_link = multi_thread_image.src;
             multi_thread_duration.innerHTML = Number(duration).toLocaleString('de-DE', { minimumFractionDigits: 1, maximumFractionDigits: 1 }) + " ms";
-            if(done == 1) {
+            if(done == "1") {
                 stopState.mult = true;
                 checkProcess();
             }else{
