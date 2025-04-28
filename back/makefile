@@ -5,13 +5,12 @@ update:
 	sudo apt install build-essential
 
 programa: server.cpp
-	g++ server.cpp -o programa -lpthread `pkg-config --cflags --libs opencv4`
+	g++ server.cpp -o programa `pkg-config --cflags --libs opencv4` -lpthread
 
 run: programa
 	./programa
 
 install:
-	sudo apt update
 	sudo apt install -y libopencv-dev
 
 clean:
