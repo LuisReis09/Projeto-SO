@@ -1,39 +1,21 @@
-# Prerequisites:
-INSTALL = sudo apt install -y
+all: update clean install programa clean_terminal run
 
-# OpenCV
-OPENCV = libopencv-dev
+update:
+	sudo apt update
+	sudo apt install build-essential
 
-# Nome do executável
-TARGET = programa
+programa: server.cpp
+	g++ server.cpp -o programa -lpthread `pkg-config --cflags --libs opencv4`
 
-# Fonte principal
-SRC = server.cpp
+run: programa
+	./programa
 
-# Flags via pkg-config (detecta paths automaticamente)
-CXXFLAGS = `pkg-config --cflags opencv4`
-LDFLAGS  = `pkg-config --libs opencv4`
+install:
+	sudo apt update
+	sudo apt install -y libopencv-dev
 
-# Compilador
-CXX = g++
-
-# Standard C++
-CXXSTD = -std=c++17
-
-# Regra padrão: compila e executa
-all: prereq build run
-
-# Instalação do OpenCV
-prereq:
-	$(INSTALL) $(OPENCV)
-
-# Compilação
-build:
-	$(CXX) $(CXXSTD) $(SRC) -o $(TARGET) $(CXXFLAGS) $(LDFLAGS)
-
-run:
-	./$(TARGET)
-
-# Limpeza
 clean:
-	rm -f $(TARGET)
+	rm -f programa
+
+clean_terminal:
+	clear
