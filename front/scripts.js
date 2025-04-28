@@ -1,4 +1,7 @@
+// ELEMENTOS RELEVANTES
 const twins = [...document.getElementsByClassName("twin")];
+
+// Objeto com as relações das opções de cores e os botões correspondentes
 const color = {
     "Grayscale" : "gray_scale",
     "HSV" : "hsv",
@@ -31,10 +34,17 @@ var stopState = {
 var multi_thread_image_link = null;
 var single_thread_image_link = null;
 
+// EVENTOS
+
+// Para arrastar arquivso a para dentro do input
 input.addEventListener("dragenter", dragenter, false);
 input.addEventListener("dragover", dragover, false);
 input.addEventListener("drop", drop, false);
+
+// Botão de processar
 process_but.addEventListener("click", process, false);
+
+// Botões de download dos outputs
 multi_thread_download.addEventListener("click", function() {
     if(multi_thread_image_link == null) return;
     multi_thread_download.href = multi_thread_image_link;
@@ -47,6 +57,7 @@ single_thread_download.addEventListener("click", function() {
 });
 
 
+// Toggle para os botões de cores
 twins.forEach((e) => {
     e.setAttribute("onclick", "toggle(this)");
 });
@@ -62,6 +73,8 @@ function toggle(e) {
     color_sel = color[e.innerHTML];
 }
 
+// Função para preencher o dropdown das opções de thread e filtros
+// Chamada com uma lista qualquer de opções para um elemento de dropdown
 function fillDropdown(dd, opts, sel) {
     opts.forEach((e)=>{
         let newel = document.createElement("p");
@@ -72,6 +85,7 @@ function fillDropdown(dd, opts, sel) {
     sel.innerHTML = opts[0];
 }
 
+// Função para selecionar a opção do dropdown
 function selectDropdown(e, id) {
     id.innerHTML = e.innerHTML;
 }
@@ -80,6 +94,7 @@ function updateSel(e, sel) {
     sel.innerHTML = e.value;
 }
 
+// Função para atualizar a imagem de entrada
 function updateImg(img) {
     let newsource = URL.createObjectURL(img);
     input.src = newsource;
@@ -104,6 +119,7 @@ function drop(e) {
     updateImg(img);
 }
 
+// Função para começar ou parar o processamento baseado no estado atual
 function input_process() {
     if(stopState.mult && stopState.single) 
         process();
@@ -111,15 +127,12 @@ function input_process() {
         stopProcess();
 }
 
+// Função que chama a filtragem em si
 function process(){
     let file = picker.files[0];
     let type = file.name.split(".")[1];
-    /*
-        rgb, gray_scale
-        ^estou assumindo q hsv vai ser so "hsv"
-    */
-    // fetch(`/process?image=${file}&intensity=${intensity.value}&qtdThreads=${thread_sel.innerHTML}&filter=${filter_sel.innerHTML}&colorOption=${color_sel}`)
 
+    // Junta os dados da imagem e das opções escolhidas em um FormData para enviar para o backend
     const formData = new FormData();
     formData.append("image", file);
     formData.append("intensity", intensity.value);
@@ -135,6 +148,7 @@ function process(){
     })
     .then((response) => response.json())
     .then((data) => {
+        // Coloca o estado de processamento como false para que o botão de processar fique desabilitado
         stopState.mult = false;
         stopState.single = false;
         checkProcess();
@@ -144,7 +158,7 @@ function process(){
     })
 }
 
-
+// Confere o estado atual de processamento e habilita ou desabilita o botão de processar
 function checkProcess() {
     if(stopState.single && stopState.mult) {
         process_but.innerHTML = "Process";
@@ -156,6 +170,9 @@ function checkProcess() {
 }
 
 window.onload = () => {
+    // Preenche os dropdowns de threads e filtros com as opções disponíveis informadas pelo backend
+    // Este trecho é executado quando a página é carregada
+    // Isso é feito para que o front se adapte a qualquer mudança nas funções abrangidas pelo backend
     fetch("/getThreadsOptions")
     .then((response) => response.json())
     .then((data) => {
@@ -186,10 +203,13 @@ function gettingImage_SingleThread(seconds) {
             return response.blob().then(blob => ({ blob, done, duration }));
         })
         .then(({blob, done, duration}) => {
+            // Aqui, a imagem é atualizada conforme o processamento avança e o tempo de processamento corrente é mostrado
             single_thread_image.src = URL.createObjectURL(blob);
             single_thread_image_link = single_thread_image.src;
             single_thread_duration.innerHTML = Number(duration).toLocaleString('de-DE', { minimumFractionDigits: 1, maximumFractionDigits: 1 }) + " ms";
             
+            // Se o processamento estiver completo, a função de atualização é parada e o estado de processamento para a imagem singlethread é atualizado
+            // Tão como a imagem em si
             if(done == "1") {
                 stopState.single = true;
                 checkProcess();
@@ -201,6 +221,7 @@ function gettingImage_SingleThread(seconds) {
 }
 
 function gettingImage_MultiThread(seconds) {
+    // O mesmo que a função acima, mas para o processamento multithread
     setTimeout(() => {
         fetch("/getMultiThreadImage")
         .then((response) => {
@@ -209,10 +230,13 @@ function gettingImage_MultiThread(seconds) {
             return response.blob().then(blob => ({ blob, done, duration }));
         })
         .then(({blob, done, duration}) => {
-                     
+            // Update da imagem e do tempo de processamento
             multi_thread_image.src = URL.createObjectURL(blob);
             multi_thread_image_link = multi_thread_image.src;
             multi_thread_duration.innerHTML = Number(duration).toLocaleString('de-DE', { minimumFractionDigits: 1, maximumFractionDigits: 1 }) + " ms";
+            
+            // Se o processamento estiver completo, a função de atualização é parada e o estado de processamento para a imagem multithread é atualizado
+            // Tão como a imagem em si
             if(done == "1") {
                 stopState.mult = true;
                 checkProcess();
