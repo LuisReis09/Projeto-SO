@@ -288,10 +288,10 @@ int main(){
                 "grayscale", 
                 "median", 
                 "gaussian", 
-                "laplacian90 border",
-                "laplacian45 border",
                 "laplacian90 sharpen",
-                "laplacian45 sharpen"
+                "laplacian45 sharpen",
+                "laplacian90 border",
+                "laplacian45 border"
             ]})";
             res.set_content(json_response, "application/json");
         }catch(exception& e){

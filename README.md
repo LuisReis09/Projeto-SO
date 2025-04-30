@@ -36,15 +36,16 @@ O usuário pode escolher o tipo de processamento aplicado à imagem:
 
 - **Filtros**:
   - Negativo
+  - Limiarização
   - Blur (Média)
   - Nitidez
   - Escala de Cinza
   - Mediana
   - Gaussiano
-
-- **Máscaras**:
   - Laplaciano sharpen 90 (realce de detalhes, sem diagonais)
   - Laplaciano sharpen 45 (realce de detalhes, com diagonais)
+
+- **Máscaras**:
   - Laplaciano detecção de bordas 90
   - Laplaciano detecção de bordas 45
 
@@ -202,7 +203,7 @@ clear
 # Processamento Digital de Imagens
 
 ### Embora esteja fora do escopo inicial do projeto, a implementação manual dos filtros utilizados nos testes proporcionou um grande aprendizado. Essa etapa adicional reforçou e consolidou a compreensão da teoria relacionada ao Processamento Digital de Imagens (PDI). A seguir, são apresentados exemplos visuais que demonstram a aplicação dos filtros desenvolvidos e sua utilidade prática:
-(ps: todas as imagens utilizadas como exemplo foram registradas por `Herick José`)
+*ps: todas as imagens utilizadas como exemplo foram registradas por `Herick José`*
 
   1. **Negative Filter (filtro negativo)**: *Inverte os valores de intensidade dos pixels, realçando contornos e destacando detalhes ao transformar áreas claras em escuras e vice-versa. Útil para realce visual e análise de estruturas.*
 
@@ -216,4 +217,53 @@ clear
   <p align="center">
       <img src="/readmeImages/thresholding0ex.jpg" width="300"/>
       <img src="/readmeImages/thresholding1ex.png" width="300"/>
+  </p>
+
+  3. **Blur Filter (filtro de borramento)**: *Suaviza a imagem ao reduzir variações bruscas de intensidade entre os pixels, sendo útil para remoção de ruído e pré-processamento antes de outras operações, como detecção de bordas.*
+
+  <p align="center">
+      <img src="/readmeImages/blur0ex.jpg" width="300"/>
+      <img src="/readmeImages/blur1ex.png" width="300"/>
+  </p>
+
+  4. **Sharpen Filter (filtro de nitidez)**: *Enfatiza as bordas e detalhes da imagem, aumentando o contraste local entre pixels vizinhos. É útil para destacar contornos e tornar estruturas mais nítidas.*
+
+  <p align="center">
+      <img src="/readmeImages/sharpen0ex.jpg" width="300"/>
+      <img src="/readmeImages/sharpen1ex.png" width="300"/>
+  </p>
+
+  5. **Grayscale Filter (filtro de escala de cinza)**: *Transforma uma imagem colorida em uma representação monocromática, preservando apenas as intensidades de luminosidade. Essa operação simplifica o processamento e é frequentemente usada como etapa preliminar em algoritmos de visão computacional.*
+
+  <p align="center">
+      <img src="/readmeImages/gs0ex.jpg" width="300"/>
+      <img src="/readmeImages/gs1ex.png" width="300"/>
+  </p>
+
+  5. **Median Filter (filtro de mediana)**: *Substitui cada pixel pelo valor mediano de seus vizinhos, sendo eficaz na remoção de ruídos impulsivos (como o sal e pimenta) sem comprometer significativamente as bordas da imagem.*
+
+  <p align="center">
+      <img src="/readmeImages/median0ex.jpg" width="300"/>
+      <img src="/readmeImages/median1ex.png" width="300"/>
+  </p>
+
+  5. **Gaussian Filter (filtro gaussiano)**: *Aplica uma convolução com uma função de distribuição normal, suavizando a imagem de forma controlada. É amplamente utilizado para reduzir ruídos e preparar a imagem para operações como detecção de bordas.*
+
+  <p align="center">
+      <img src="/readmeImages/gaussian0ex.png" width="300"/>
+      <img src="/readmeImages/gaussian1ex.png" width="300"/>
+  </p>
+
+  5. **Laplacian Sharpen Filter (filtro de nitidez laplaciano)**: *É um operador de segunda ordem usado para realçar bordas, destacando regiões de transição abrupta de intensidade. Máscaras orientadas em 90° e 45° permitem enfatizar bordas verticais/horizontais e diagonais, respectivamente, contribuindo para uma detecção mais precisa de contornos em diferentes direções.*
+
+  <p align="center">
+      <img src="/readmeImages/laplacianSharpen0ex.jpg" width="300"/>
+      <img src="/readmeImages/laplacianSharpen1ex.png" width="300"/>
+  </p>
+
+  5. **Laplacian Edge Detection Mask (máscara de detecção de bordas laplaciana)**: *Utiliza derivadas de segunda ordem para identificar mudanças abruptas na intensidade da imagem, realçando contornos em todas as direções. Por ser isotrópica, essa máscara responde igualmente bem a bordas horizontais, verticais e diagonais.*
+
+  <p align="center">
+      <img src="/readmeImages/laplacianBorder0ex.jpg" width="300"/>
+      <img src="/readmeImages/laplacianBorder1ex.png" width="300"/>
   </p>
