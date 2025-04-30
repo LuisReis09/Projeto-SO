@@ -282,6 +282,7 @@ int main(){
             res.status = 200;
             string json_response = R"({"options": [
                 "negative", 
+                "thresholding",
                 "blur", 
                 "sharpen", 
                 "grayscale", 

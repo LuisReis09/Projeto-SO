@@ -117,6 +117,15 @@ public:
     void negative_filter(Region region, Mat& image_output);
 
     /*
+        * Para cada pixel da imagem, aplica o filtro de limiarização usando a intensidade como limiar para preto e branco.
+        * @param region Região da imagem a ser processada
+        * @param image_output Matriz de imagem que recebe o resultado do filtro
+        * @param intensity Limite para a transformação em preto ou branco
+        * @returns: void
+    */
+    void thresholding_filter(Region region, Mat& image_output, int intensity);
+
+    /*
         * Aplica um filtro de desfoque (blur) na imagem.
         * @param region Região da imagem a ser processada
         * @param image_output Matriz de imagem que recebe o resultado do filtro
@@ -526,7 +535,6 @@ inline float normalizeInInterval(int value, Interval& interval){
 // FILTROS //////////////////////////////////
 void Image::
     negative_filter(Region region, Mat& image_output) {
-        // Lê de image e coloca o resultado em image_out
 
         // Se a imagem for BGR, aplica o filtro em cada canal
         if (this->color_type == ImageColorType::RGB){
@@ -562,6 +570,71 @@ void Image::
 
                     // aplica o filtro negativo no canal único
                     image_output.at<uchar>(j, i) = 255 - this->image.at<uchar>(j, i);
+                }
+            }
+        }
+
+    }
+
+void Image::
+    thresholding_filter(Region region, Mat& image_output, int intensity) {
+        // Normaliza a intensidade para o intervalo [0, 255]
+        Interval interval = {0, 255};
+        float normalized_intensity = normalizeInInterval(intensity, interval);
+
+        // Se a imagem for BGR, aplica o filtro em cada canal
+        if (this->color_type == ImageColorType::RGB){
+            for (int i = region.x_begin; i <= region.x_end; i++){
+                for (int j = region.y_begin; j <= region.y_end; j++){
+
+                    // Pega o pixel da imagem de saída
+                    Vec3b& pixel = image_output.at<Vec3b>(j, i);
+
+                    int thresholding_value = (this->image.at<Vec3b>(j, i)[0] + this->image.at<Vec3b>(j, i)[1] + this->image.at<Vec3b>(j, i)[2]) / 3;
+                    
+                    // Aplica o filtro de limiarização
+                    if (thresholding_value < normalized_intensity) {
+                        pixel[0] = 0; // B
+                        pixel[1] = 0; // G
+                        pixel[2] = 0; // R
+                    } else {
+                        pixel[0] = 255; // B
+                        pixel[1] = 255; // G
+                        pixel[2] = 255; // R
+                    }
+                }
+            }
+        } else // se a imagem for HSV, aplica o filtro no canal de Valor
+        if(this->color_type == ImageColorType::HSV){
+            for (int i = region.x_begin; i <= region.x_end; i++){
+                for (int j = region.y_begin; j <= region.y_end; j++){
+
+                    // Pega o pixel da imagem de saída
+                    Vec3b& pixel = image_output.at<Vec3b>(j, i);
+
+                    int thresholding_value = (this->image.at<Vec3b>(j, i)[0] + this->image.at<Vec3b>(j, i)[1] + this->image.at<Vec3b>(j, i)[2]) / 3;
+                    // Aplica o filtro de limiarização
+
+                    if (thresholding_value < normalized_intensity) {
+                        pixel[2] = 0; // V
+                    } else {
+                        pixel[2] = 255; // V
+                    }
+                }
+            }  
+        }else { // imagem em tons de cinza
+            for (int i = region.x_begin; i <= region.x_end; i++){
+                for (int j = region.y_begin; j <= region.y_end; j++){
+
+                    // Pega o pixel da imagem de saída
+                    uchar thresholding_value = this->image.at<uchar>(j, i);
+
+                    // Aplica o filtro de limiarização
+                    if (thresholding_value < normalized_intensity) {
+                        image_output.at<uchar>(j, i) = 0; // Preto
+                    } else {
+                        image_output.at<uchar>(j, i) = 255; // Branco
+                    }
                 }
             }
         }
@@ -1625,8 +1698,12 @@ vector<Region>
 void Image::
     thread_process(const string& filter, int threads, Region region) {
 
+        cout << "Filter: " << filter << endl;
+
         if(filter == "negative")
             this->negative_filter(region, this->image_multiThread);
+        else if(filter == "thresholding")
+            this->thresholding_filter(region, this->image_multiThread, this->intensity);
         else if(filter == "blur")
             this->blur_filter(region, this->image_multiThread, this->intensity);
         else if(filter == "sharpen")
@@ -1662,6 +1739,8 @@ void Image::
 
         if(filter == "negative")
             this->negative_filter(region, this->image_singleThread);
+        else if(filter == "thresholding")
+            this->thresholding_filter(region, this->image_singleThread, this->intensity);
         else if(filter == "blur")
             this->blur_filter(region, this->image_singleThread, this->intensity);
         else if(filter == "sharpen")
