@@ -240,28 +240,28 @@ clear
       <img src="/readmeImages/gs1ex.png" width="300"/>
   </p>
 
-  5. **Median Filter (filtro de mediana)**: *Substitui cada pixel pelo valor mediano de seus vizinhos, sendo eficaz na remoção de ruídos impulsivos (como o sal e pimenta) sem comprometer significativamente as bordas da imagem.*
+  6. **Median Filter (filtro de mediana)**: *Substitui cada pixel pelo valor mediano de seus vizinhos, sendo eficaz na remoção de ruídos impulsivos (como o sal e pimenta) sem comprometer significativamente as bordas da imagem.*
 
   <p align="center">
       <img src="/readmeImages/median0ex.jpg" width="300"/>
       <img src="/readmeImages/median1ex.png" width="300"/>
   </p>
 
-  5. **Gaussian Filter (filtro gaussiano)**: *Aplica uma convolução com uma função de distribuição normal, suavizando a imagem de forma controlada. É amplamente utilizado para reduzir ruídos e preparar a imagem para operações como detecção de bordas.*
+  7. **Gaussian Filter (filtro gaussiano)**: *Aplica uma convolução com uma função de distribuição normal, suavizando a imagem de forma controlada. É amplamente utilizado para reduzir ruídos e preparar a imagem para operações como detecção de bordas.*
 
   <p align="center">
       <img src="/readmeImages/gaussian0ex.png" width="300"/>
       <img src="/readmeImages/gaussian1ex.png" width="300"/>
   </p>
 
-  5. **Laplacian Sharpen Filter (filtro de nitidez laplaciano)**: *É um operador de segunda ordem usado para realçar bordas, destacando regiões de transição abrupta de intensidade. Máscaras orientadas em 90° e 45° permitem enfatizar bordas verticais/horizontais e diagonais, respectivamente, contribuindo para uma detecção mais precisa de contornos em diferentes direções.*
+  8. **Laplacian Sharpen Filter (filtro de nitidez laplaciano)**: *É um operador de segunda ordem usado para realçar bordas, destacando regiões de transição abrupta de intensidade. Máscaras orientadas em 90° e 45° permitem enfatizar bordas verticais/horizontais e diagonais, respectivamente, contribuindo para uma detecção mais precisa de contornos em diferentes direções.*
 
   <p align="center">
       <img src="/readmeImages/laplacianSharpen0ex.jpg" width="300"/>
       <img src="/readmeImages/laplacianSharpen1ex.png" width="300"/>
   </p>
 
-  5. **Laplacian Edge Detection Mask (máscara de detecção de bordas laplaciana)**: *Utiliza derivadas de segunda ordem para identificar mudanças abruptas na intensidade da imagem, realçando contornos em todas as direções. Por ser isotrópica, essa máscara responde igualmente bem a bordas horizontais, verticais e diagonais.*
+  9. **Laplacian Edge Detection Mask (máscara de detecção de bordas laplaciana)**: *Utiliza derivadas de segunda ordem para identificar mudanças abruptas na intensidade da imagem, realçando contornos em todas as direções. Por ser isotrópica, essa máscara responde igualmente bem a bordas horizontais, verticais e diagonais.*
 
   <p align="center">
       <img src="/readmeImages/laplacianBorder0ex.jpg" width="300"/>

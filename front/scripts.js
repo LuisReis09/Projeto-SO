@@ -84,10 +84,18 @@ function fillDropdown(dd, opts, sel) {
     });
     sel.innerHTML = opts[0];
 }
+document.querySelectorAll(".dropbtn").forEach((btn) => {
+    btn.addEventListener("click", () => {
+        const dropdown = btn.nextElementSibling;
+        dropdown.classList.toggle("hidden");
+    });
+});
 
 // Função para selecionar a opção do dropdown
 function selectDropdown(e, id) {
     id.innerHTML = e.innerHTML;
+
+    e.parentElement.classList.add("hidden");
 }
 
 function updateSel(e, sel) {

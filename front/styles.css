@@ -408,3 +408,7 @@ a {
     background-color: var(--persian-indigo);
     box-shadow: -10px 10px var(--french-violet);
 }
+
+.hidden {
+    display: none !important;
+}
