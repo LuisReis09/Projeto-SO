@@ -612,10 +612,8 @@ void Image::
                     // Pega o pixel da imagem de saída
                     Vec3b& pixel = image_output.at<Vec3b>(j, i);
 
-                    int thresholding_value = (this->image.at<Vec3b>(j, i)[0] + this->image.at<Vec3b>(j, i)[1] + this->image.at<Vec3b>(j, i)[2]) / 3;
                     // Aplica o filtro de limiarização
-
-                    if (thresholding_value < normalized_intensity) {
+                    if (this->image.at<Vec3b>(j, i)[2] < normalized_intensity) {
                         pixel[2] = 0; // V
                     } else {
                         pixel[2] = 255; // V
@@ -1697,8 +1695,6 @@ vector<Region>
 // Essa funcao devera delegar a regiao recebida a uma funcao de filtro, utilizando o atributo filter e intensity da classe Image
 void Image::
     thread_process(const string& filter, int threads, Region region) {
-
-        cout << "Filter: " << filter << endl;
 
         if(filter == "negative")
             this->negative_filter(region, this->image_multiThread);

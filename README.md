@@ -204,10 +204,16 @@ clear
 ### Embora esteja fora do escopo inicial do projeto, a implementação manual dos filtros utilizados nos testes proporcionou um grande aprendizado. Essa etapa adicional reforçou e consolidou a compreensão da teoria relacionada ao Processamento Digital de Imagens (PDI). A seguir, são apresentados exemplos visuais que demonstram a aplicação dos filtros desenvolvidos e sua utilidade prática:
 (ps: todas as imagens utilizadas como exemplo foram registradas por `Herick José`)
 
-  1. Negative Filter:
-  <p>O filtro negativo inverte os valores de intensidade dos pixels, realçando contornos e destacando detalhes ao transformar áreas claras em escuras e vice-versa. Útil para realce visual e análise de estruturas.</p>
+  1. **Negative Filter (filtro negativo)**: *Inverte os valores de intensidade dos pixels, realçando contornos e destacando detalhes ao transformar áreas claras em escuras e vice-versa. Útil para realce visual e análise de estruturas.*
 
   <p align="center">
       <img src="/readmeImages/negative0ex.jpg" width="300"/>
       <img src="/readmeImages/negative1ex.png" width="300"/>
+  </p>
+
+  2. **Thresholding Filter (filtro de limiarização)**: *Transforma uma imagem em uma versão binária, separando objetos do fundo com base em um valor de intensidade. É amplamente utilizado na segmentação de imagens e na detecção de formas.*
+
+  <p align="center">
+      <img src="/readmeImages/thresholding0ex.jpg" width="300"/>
+      <img src="/readmeImages/thresholding1ex.png" width="300"/>
   </p>
