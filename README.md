@@ -207,13 +207,14 @@ clear
   1. Negative Filter:
   <p>O filtro negativo inverte os valores de intensidade dos pixels, realçando contornos e destacando detalhes ao transformar áreas claras em escuras e vice-versa. Útil para realce visual e análise de estruturas.</p>
 
-  <p align="center">
-    <!-- <p>
-      Original: -->
+  <p style="display: flex; gap: 10px;">
+    <div style="display: flex; flex-direction: column; gap: 10px">
+      Original:
       <img src="/readmeImages/negative0ex.jpg" width="300"/>
-    <!-- </p>
-    <p>
-      Filtro negativo: -->
+    </div>
+
+    <div style="display: flex; flex-direction: column; gap: 10px">
+      Filtro negativo:
       <img src="/readmeImages/negative1ex.png" width="300"/>
-    <!-- </p> -->
+    </div>
   </p>
